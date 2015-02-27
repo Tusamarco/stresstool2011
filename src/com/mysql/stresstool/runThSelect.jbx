@@ -1,0 +1,30 @@
+[PropertyInfo]
+alpha,String[],false,false, , ,false,<default>
+connUrl,String,false,false, , ,false,<default>
+dbType,String,false,false, , ,false,<default>
+doBatch,boolean,false,false, , ,false,<default>
+doDelete,boolean,false,false, , ,false,<default>
+dolog,boolean,false,false, , ,false,<default>
+droptable,boolean,false,false, , ,false,<default>
+file,java.io.File,false,false, , ,false,<default>
+insertThread,java.util.Map,false,false, , ,false,<default>
+operationShort,boolean,false,false, , ,false,<default>
+pctInsert,float,false,false, , ,false,<default>
+pctSelect,float,false,false, , ,false,<default>
+poolNumber,int,false,false, , ,false,<default>
+queryType,String,false,false, , ,false,<default>
+repeatNumber,int,false,false, , ,false,<default>
+rnd,java.util.Random,false,false, , ,false,<default>
+selectThread,java.util.Map,false,false, , ,false,<default>
+sleepFor,int,false,false, , ,false,<default>
+sourceSQLPath,String,false,false, , ,false,<default>
+tableEngine,String,false,false, , ,false,<default>
+threadInfoInsertMap,java.util.Map,false,false, , ,false,<default>
+threadInfoSelectMap,java.util.Map,false,false,threadInfoSelectMap,threadInfoSelectMap,true,<default>
+truncate,boolean,false,false, , ,false,<default>
+mySQLStatistics,com.mysql.stresstool.MySQLStats,false,false,MySQLStatistics,MySQLStatistics,true,<default>
+[IconNames]
+
+
+
+

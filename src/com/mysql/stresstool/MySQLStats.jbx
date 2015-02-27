@@ -1,0 +1,21 @@
+[PropertyInfo]
+conn,java.sql.Connection,false,false, , ,false,<default>
+doBatching,boolean,false,false,doBatching,doBatching,true,<default>
+endReport,java.util.Map,false,false, , ,false,<default>
+jdbcUrl,String,false,false, , ,false,<default>
+numberOfLoops,int,false,false,numberOfLoops,numberOfLoops,true,<default>
+numberOfThreads,int,false,false, , ,true,<default>
+startReport,java.util.Map,false,false, , ,false,<default>
+statusReportsCollection,java.util.Map,false,false, , ,false,<default>
+systemVariables,java.util.Map,false,false,systemVariables,systemVariables,true,<default>
+testDate,String,false,false,testDate,testDate,true,<default>
+totalExecutionTime,long,false,false,totalExecutionTime,totalExecutionTime,true,<default>
+totalQueryToRun,long,false,false,totalQueryToRun,totalQueryToRun,true,<default>
+totalQueryToRunReads,long,false,false,totalQueryToRunReads,totalQueryToRunReads,true,<default>
+totalQueryToRunWrites,long,false,false,totalQueryToRunWrites,totalQueryToRunWrites,true,<default>
+summaryprinted,boolean,false,false,summaryprinted,summaryprinted,true,<default>
+[IconNames]
+
+
+
+

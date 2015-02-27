@@ -1,0 +1,14 @@
+[PropertyInfo]
+asBean,Object,false,false, , ,true,<default>
+empty,boolean,false,false, , ,true,<default>
+encoding,String,false,false,encoding,encoding,true,<default>
+excludedProperty,String[],false,false, , ,true,<default>
+isMap,Boolean,false,false, , ,false,<default>
+properties,List,false,false, , ,true,<default>
+retrivableFields,List,false,false, , ,true,<default>
+values,Map,false,false, , ,false,<default>
+[IconNames]
+
+
+
+
