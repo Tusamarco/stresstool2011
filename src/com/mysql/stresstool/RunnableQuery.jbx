@@ -1,0 +1,13 @@
+[PropertyInfo]
+conn,java.sql.Connection,false,false, , ,false,<default>
+doLog,boolean,false,false,doLog,doLog,true,<default>
+ID,int,false,false,ID,ID,true,<default>
+jdbcUrl,String,false,false,jdbcUrl,jdbcUrl,true,<default>
+queriesFileIn,java.io.File,false,false,QueriesFileIn,QueriesFileIn,true,<default>
+repeatNumber,int,false,false,repeatNumber,repeatNumber,true,<default>
+repet,boolean,false,false,repet,repet,true,<default>
+[IconNames]
+
+
+
+

@@ -1,0 +1,23 @@
+[PropertyInfo]
+active,boolean,false,false, , ,true,<default>
+conn,java.sql.Connection,false,false, , ,false,<default>
+dbType,String,false,false, , ,true,<default>
+doDelete,boolean,false,false, , ,true,<default>
+doLog,boolean,false,false, , ,true,<default>
+engine,String,false,false, , ,true,<default>
+executionTime,long,false,false,executionTime,executionTime,true,<default>
+ID,int,false,false, , ,true,<default>
+jdbcUrl,String,false,false, , ,true,<default>
+mySQLStatistics,com.mysql.stresstool.MySQLStats,false,false, , ,false,<default>
+operationShort,boolean,false,false,operationShort,operationShort,true,<default>
+queriesFileIn,java.io.File,false,false, , ,true,<default>
+repeat,boolean,false,false, , ,true,<default>
+repeatNumber,int,false,false, , ,true,<default>
+repet,boolean,false,false, , ,true,<default>
+sleepFor,int,false,false, , ,true,<default>
+useBatchInsert,boolean,false,false, , ,true,<default>
+[IconNames]
+
+
+
+

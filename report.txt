@@ -1,0 +1,357 @@
+
+
+****============================================================================*******
+****                        FINAL REPORT    *** GENERAL ***                     *******
+****============================================================================*******
+-------------------------------- GENERAL TEST INFORMATION ------------------------------------------
+ jdbc = jdbc:mysql://192.168.0.35:3307/test?user=stress&password=tool&autoReconnect=true
+ truncate = false
+ poolNumber = 4
+ repeatNumber = 10000
+ tableEngine = InnoDB
+ droptable = false
+ dolog = false
+ Interval sleepFor = 0
+ dbType = MySQL
+ operation short (true|false) = true
+ do Delete each 500 inserts = true
+ do batch inserts of 50 records = true
+
+Runned on = 19-10-2014_02:17:34
+------------------------------GENERAL DATABASE INFORMATION -----------------------------------------
+Total Number Of query Executed = 18000
+Total Number Of query Executed for writes = 8000
+Total Number Of query Executed for reads  = 0
+Total Number Of query Executed for deletes  = 10000
+Total Kbyte IN  = 449367888 xsec = 24102
+Total Kbyte OUT  = 1168913494 xsec = 62696
+Total Execution time = 18644
+Inserts = 193348 xsec = 10
+Replace = 0 xsec = 0
+Updates = 0 xsec = 0
+Deletes = 411351 xsec = 22
+Selects = 258296 xsec = 13
+Begins = 60124 xsec = 3
+Commits = 666046 xsec = 35
+Number of Connections = 36605 xsec = 1
+Number of Temporary table on disk = 0
+Number of Questions = 1687458 xsec = 90
+Number of Max_used_connections = 0 xsec = 0
+Number of Opened_tables = 0 xsec = 0
+------------------------------------ DELAYS ------------------------------------------------
+Delayed insert threads   = 0 xsec = 0
+Delayed Errors  = 0 xsec = 0
+Delayed writes  = 0 xsec = 0
+Not flushed delayed rows = 0 xsec = 0
+------------------------------------ LOCKS ------------------------------------------------
+Number of Table_locks_immediate = 844486 xsec = 45
+Number of Table_locks_waited = 0 xsec = 0
+-----------------------------INNODB BUFFER POOL ACTIONS -----------------------------------
+Number of Innodb_buffer_pool_pages_flushed = 3584621 xsec = 192
+Number of Innodb_buffer_pool_read_ahead_rnd = 0 xsec = 0
+Number of Innodb_buffer_pool_read_ahead_seq = 0 xsec = 0
+Number of Innodb_buffer_pool_read_requests = 108307271 xsec = 5809
+Number of Innodb_buffer_pool_reads = 147571 xsec = 7
+Number of Innodb_data_fsyncs = 305240 xsec = 16
+-----------------------------INNODB BUFFER POOL Dirty Page -----------------------------------
+Number of Innodb_buffer_pool_pages_dirty = 2053 xsec = 0
+--------------------------------- INNODB DATA READS ----------------------------------------
+Number of Innodb Reads from BPool (not from disk) = 108159700 xsec = 5801
+Number of Innodb_data_reads = 494762 xsec = 26
+Number of Innodb_rows_read = 891122 xsec = 47
+Number of Innodb_pages_read = 494770 xsec = 26
+----------------------------------INNODB DATA WRITES ---------------------------------------
+Number of Innodb_data_writes = 3724880 xsec = 199
+Number of Innodb_rows_inserted = 6193948 xsec = 332
+Number of Innodb_rows_updated = 0 xsec = 0
+Number of Innodb_rows_deleted = 191 xsec = 0
+Number of Innodb_pages_written = 3584620 xsec = 192
+Number of Innodb_pages_created = 282031 xsec = 15
+-----------------------------------INNODB DBLBUFFER WRITES ---------------------------------
+Number of Innodb_dblwr_writes = 37316 xsec = 2
+Number of Innodb_dblwr_pages_written = 3584621 xsec = 192
+-----------------------------------INNODB LOG Activities ---------------------------------
+Number of Innodb_log_waits = 0 xsec = 0
+Number of Innodb_log_write_requests = 15022357 xsec = 805
+Number of Innodb_log_writes = 60309 xsec = 3
+Number of Innodb_os_log_fsyncs = 63373 xsec = 3
+Number of Innodb_os_log_pending_fsyncs = 0 xsec = 0
+Number of Innodb_os_log_pending_writes = 0 xsec = 0
+Number of Innodb_os_log_written = 6094071296 xsec = 326865
+----------------------------------- Handlers  ---------------------------------------
+Number of Handler_commit = 3274851 xsec = 175
+Number of Handler_delete = 191 xsec = 0
+Number of Handler_discover = 0 xsec = 0
+Number of Handler_prepare = 671189 xsec = 36
+Number of Handler_read_first = 239857 xsec = 12
+Number of Handler_read_key = 891065 xsec = 47
+Number of Handler_read_last = 239857 xsec = 12
+Number of Handler_read_next = 70 xsec = 0
+Number of Handler_read_prev = 0 xsec = 0
+Number of Handler_read_rnd = 121 xsec = 0
+Number of Handler_read_rnd_next = 12030124 xsec = 645
+Number of Handler_rollback = 64 xsec = 0
+Number of Handler_savepoint = 0 xsec = 0
+Number of Handler_savepoint_rollback = 0 xsec = 0
+Number of Handler_update = 0 xsec = 0
+Number of Handler_write = 18156692 xsec = 973
+----------------------------------- ndbinfo  ---------------------------------------
+-----------------------------------MyIsam Key Buffer ---------------------------------------
+Number of Key_reads = 0 xsec = 0
+Number of Key_writes = 0 xsec = 0
+Number of Key_read_requests = 0 xsec = 0
+Number of Key_write_requests = 0 xsec = 0
+Number of Key_blocks_not_flushed = 0 xsec = 0
+Number of Key_blocks_unused = 0 xsec = 0
+Number of Key_blocks_used = 0 xsec = 0
+----------------------------------- QUERY CACHE --------------------------------------------
+Number of Qcache_hits = 0 xsec = 0
+Number of Qcache_inserts = 0 xsec = 0
+Number of Qcache_not_cached = 0 xsec = 0
+Number of Qcache_lowmem_prunes = 0 xsec = 0
+Number of Qcache_free_memory = 0 xsec = 0
+Number of Qcache_queries_in_cache = 0 xsec = 0
+Number of Qcache_total_blocks = 0 xsec = 0
+------------------------------------ THREADS    --------------------------------------------
+Number of Threads_cached = -1
+Number of Threads_connected = 1
+Number of Threads_created = 0
+Number of Threads_running = 1
+
+
+****============================================================================*******
+****                        FINAL REPORT    *** GENERAL ***                     *******
+****============================================================================*******
+-------------------------------- GENERAL TEST INFORMATION ------------------------------------------
+ jdbc = jdbc:mysql://192.168.0.3:3307/test?user=stress&password=tool&autoReconnect=true
+ truncate = false
+ poolNumber = 1
+ repeatNumber = 10000
+ tableEngine = InnoDB
+ droptable = false
+ dolog = false
+ Interval sleepFor = 0
+ dbType = MySQL
+ operation short (true|false) = true
+ do Delete each 500 inserts = true
+ do batch inserts of 50 records = true
+
+Runned on = 07-11-2014_09:15:55
+------------------------------GENERAL DATABASE INFORMATION -----------------------------------------
+Total Number Of query Executed = 8000
+Total Number Of query Executed for writes = 8000
+Total Number Of query Executed for reads  = 0
+Total Number Of query Executed for deletes  = 0
+Total Kbyte IN  = 27392 xsec = 9130
+Total Kbyte OUT  = 762 xsec = 254
+Total Execution time = 3
+Inserts = 0 xsec = 0
+Replace = 0 xsec = 0
+Updates = 0 xsec = 0
+Deletes = 0 xsec = 0
+Selects = 4 xsec = 1
+Begins = 0 xsec = 0
+Commits = 0 xsec = 0
+Number of Connections = 4 xsec = 1
+Number of Temporary table on disk = 0
+Number of Questions = 14 xsec = 4
+Number of Max_used_connections = 1 xsec = 0
+Number of Opened_tables = 0 xsec = 0
+------------------------------------ DELAYS ------------------------------------------------
+Delayed insert threads   = 0 xsec = 0
+Delayed Errors  = 0 xsec = 0
+Delayed writes  = 0 xsec = 0
+Not flushed delayed rows = 0 xsec = 0
+------------------------------------ LOCKS ------------------------------------------------
+Number of Table_locks_immediate = 0 xsec = 0
+Number of Table_locks_waited = 0 xsec = 0
+-----------------------------INNODB BUFFER POOL ACTIONS -----------------------------------
+Number of Innodb_buffer_pool_pages_flushed = 3 xsec = 1
+Number of Innodb_buffer_pool_read_ahead_rnd = 0 xsec = 0
+Number of Innodb_buffer_pool_read_ahead_seq = 0 xsec = 0
+Number of Innodb_buffer_pool_read_requests = 0 xsec = 0
+Number of Innodb_buffer_pool_reads = 0 xsec = 0
+Number of Innodb_data_fsyncs = 4 xsec = 1
+-----------------------------INNODB BUFFER POOL Dirty Page -----------------------------------
+Number of Innodb_buffer_pool_pages_dirty = -3 xsec = -1
+--------------------------------- INNODB DATA READS ----------------------------------------
+Number of Innodb Reads from BPool (not from disk) = 0 xsec = 0
+Number of Innodb_data_reads = 0 xsec = 0
+Number of Innodb_rows_read = 0 xsec = 0
+Number of Innodb_pages_read = 0 xsec = 0
+----------------------------------INNODB DATA WRITES ---------------------------------------
+Number of Innodb_data_writes = 4 xsec = 1
+Number of Innodb_rows_inserted = 0 xsec = 0
+Number of Innodb_rows_updated = 0 xsec = 0
+Number of Innodb_rows_deleted = 0 xsec = 0
+Number of Innodb_pages_written = 3 xsec = 1
+Number of Innodb_pages_created = 0 xsec = 0
+-----------------------------------INNODB DBLBUFFER WRITES ---------------------------------
+Number of Innodb_dblwr_writes = 0 xsec = 0
+Number of Innodb_dblwr_pages_written = 0 xsec = 0
+-----------------------------------INNODB LOG Activities ---------------------------------
+Number of Innodb_log_waits = 0 xsec = 0
+Number of Innodb_log_write_requests = 0 xsec = 0
+Number of Innodb_log_writes = 0 xsec = 0
+Number of Innodb_os_log_fsyncs = 1 xsec = 0
+Number of Innodb_os_log_pending_fsyncs = 0 xsec = 0
+Number of Innodb_os_log_pending_writes = 0 xsec = 0
+Number of Innodb_os_log_written = 0 xsec = 0
+----------------------------------- Handlers  ---------------------------------------
+Number of Handler_commit = 0 xsec = 0
+Number of Handler_delete = 0 xsec = 0
+Number of Handler_discover = 0 xsec = 0
+Number of Handler_prepare = 0 xsec = 0
+Number of Handler_read_first = 0 xsec = 0
+Number of Handler_read_key = 0 xsec = 0
+Number of Handler_read_last = 0 xsec = 0
+Number of Handler_read_next = 0 xsec = 0
+Number of Handler_read_prev = 0 xsec = 0
+Number of Handler_read_rnd = 0 xsec = 0
+Number of Handler_read_rnd_next = 900 xsec = 300
+Number of Handler_rollback = 0 xsec = 0
+Number of Handler_savepoint = 0 xsec = 0
+Number of Handler_savepoint_rollback = 0 xsec = 0
+Number of Handler_update = 0 xsec = 0
+Number of Handler_write = 894 xsec = 298
+----------------------------------- ndbinfo  ---------------------------------------
+-----------------------------------MyIsam Key Buffer ---------------------------------------
+Number of Key_reads = 0 xsec = 0
+Number of Key_writes = 0 xsec = 0
+Number of Key_read_requests = 0 xsec = 0
+Number of Key_write_requests = 0 xsec = 0
+Number of Key_blocks_not_flushed = 0 xsec = 0
+Number of Key_blocks_unused = 0 xsec = 0
+Number of Key_blocks_used = 0 xsec = 0
+----------------------------------- QUERY CACHE --------------------------------------------
+Number of Qcache_hits = 0 xsec = 0
+Number of Qcache_inserts = 0 xsec = 0
+Number of Qcache_not_cached = 0 xsec = 0
+Number of Qcache_lowmem_prunes = 0 xsec = 0
+Number of Qcache_free_memory = 0 xsec = 0
+Number of Qcache_queries_in_cache = 0 xsec = 0
+Number of Qcache_total_blocks = 0 xsec = 0
+------------------------------------ THREADS    --------------------------------------------
+Number of Threads_cached = 0
+Number of Threads_connected = 0
+Number of Threads_created = 4
+Number of Threads_running = 1
+
+
+****============================================================================*******
+****                        FINAL REPORT    *** GENERAL ***                     *******
+****============================================================================*******
+-------------------------------- GENERAL TEST INFORMATION ------------------------------------------
+ jdbc = jdbc:mysql://192.168.0.3:3307/test?user=stress&password=tool&autoReconnect=true
+ truncate = false
+ poolNumber = 1
+ repeatNumber = 1000
+ tableEngine = InnoDB
+ droptable = true
+ dolog = false
+ Interval sleepFor = 0
+ dbType = MySQL
+ operation short (true|false) = true
+ do Delete each 500 inserts = true
+ do batch inserts of 50 records = true
+
+Runned on = 07-11-2014_09:45:31
+------------------------------GENERAL DATABASE INFORMATION -----------------------------------------
+Total Number Of query Executed = 1000
+Total Number Of query Executed for writes = 1000
+Total Number Of query Executed for reads  = 0
+Total Number Of query Executed for deletes  = 0
+Total Kbyte IN  = 11128072 xsec = 60151
+Total Kbyte OUT  = 17273427 xsec = 93369
+Total Execution time = 185
+Inserts = 1001 xsec = 5
+Replace = 6681 xsec = 36
+Updates = 0 xsec = 0
+Deletes = 0 xsec = 0
+Selects = 485 xsec = 2
+Begins = 1001 xsec = 5
+Commits = 880 xsec = 4
+Number of Connections = 1068 xsec = 5
+Number of Temporary table on disk = 22
+Number of Questions = 12866 xsec = 69
+Number of Max_used_connections = 2 xsec = 0
+Number of Opened_tables = 26 xsec = 0
+------------------------------------ DELAYS ------------------------------------------------
+Delayed insert threads   = 0 xsec = 0
+Delayed Errors  = 0 xsec = 0
+Delayed writes  = 0 xsec = 0
+Not flushed delayed rows = 0 xsec = 0
+------------------------------------ LOCKS ------------------------------------------------
+Number of Table_locks_immediate = 1610 xsec = 8
+Number of Table_locks_waited = 0 xsec = 0
+-----------------------------INNODB BUFFER POOL ACTIONS -----------------------------------
+Number of Innodb_buffer_pool_pages_flushed = 10571 xsec = 57
+Number of Innodb_buffer_pool_read_ahead_rnd = 0 xsec = 0
+Number of Innodb_buffer_pool_read_ahead_seq = 0 xsec = 0
+Number of Innodb_buffer_pool_read_requests = 2239634 xsec = 12106
+Number of Innodb_buffer_pool_reads = 0 xsec = 0
+Number of Innodb_data_fsyncs = 2724 xsec = 14
+-----------------------------INNODB BUFFER POOL Dirty Page -----------------------------------
+Number of Innodb_buffer_pool_pages_dirty = 711 xsec = 3
+--------------------------------- INNODB DATA READS ----------------------------------------
+Number of Innodb Reads from BPool (not from disk) = 2239634 xsec = 12106
+Number of Innodb_data_reads = 12 xsec = 0
+Number of Innodb_rows_read = 174777 xsec = 944
+Number of Innodb_pages_read = 0 xsec = 0
+----------------------------------INNODB DATA WRITES ---------------------------------------
+Number of Innodb_data_writes = 12983 xsec = 70
+Number of Innodb_rows_inserted = 138312 xsec = 747
+Number of Innodb_rows_updated = 0 xsec = 0
+Number of Innodb_rows_deleted = 0 xsec = 0
+Number of Innodb_pages_written = 10571 xsec = 57
+Number of Innodb_pages_created = 7752 xsec = 41
+-----------------------------------INNODB DBLBUFFER WRITES ---------------------------------
+Number of Innodb_dblwr_writes = 235 xsec = 1
+Number of Innodb_dblwr_pages_written = 10671 xsec = 57
+-----------------------------------INNODB LOG Activities ---------------------------------
+Number of Innodb_log_waits = 0 xsec = 0
+Number of Innodb_log_write_requests = 193093 xsec = 1043
+Number of Innodb_log_writes = 1765 xsec = 9
+Number of Innodb_os_log_fsyncs = 1805 xsec = 9
+Number of Innodb_os_log_pending_fsyncs = 0 xsec = 0
+Number of Innodb_os_log_pending_writes = 0 xsec = 0
+Number of Innodb_os_log_written = 94036480 xsec = 508305
+----------------------------------- Handlers  ---------------------------------------
+Number of Handler_commit = 6844 xsec = 36
+Number of Handler_delete = 0 xsec = 0
+Number of Handler_discover = 0 xsec = 0
+Number of Handler_prepare = 6266 xsec = 33
+Number of Handler_read_first = 4 xsec = 0
+Number of Handler_read_key = 461 xsec = 2
+Number of Handler_read_last = 2 xsec = 0
+Number of Handler_read_next = 174318 xsec = 942
+Number of Handler_read_prev = 0 xsec = 0
+Number of Handler_read_rnd = 0 xsec = 0
+Number of Handler_read_rnd_next = 291646 xsec = 1576
+Number of Handler_rollback = 9 xsec = 0
+Number of Handler_savepoint = 0 xsec = 0
+Number of Handler_savepoint_rollback = 0 xsec = 0
+Number of Handler_update = 0 xsec = 0
+Number of Handler_write = 434326 xsec = 2347
+----------------------------------- ndbinfo  ---------------------------------------
+-----------------------------------MyIsam Key Buffer ---------------------------------------
+Number of Key_reads = 0 xsec = 0
+Number of Key_writes = 0 xsec = 0
+Number of Key_read_requests = 0 xsec = 0
+Number of Key_write_requests = 0 xsec = 0
+Number of Key_blocks_not_flushed = 0 xsec = 0
+Number of Key_blocks_unused = 0 xsec = 0
+Number of Key_blocks_used = 0 xsec = 0
+----------------------------------- QUERY CACHE --------------------------------------------
+Number of Qcache_hits = 0 xsec = 0
+Number of Qcache_inserts = 0 xsec = 0
+Number of Qcache_not_cached = 0 xsec = 0
+Number of Qcache_lowmem_prunes = 0 xsec = 0
+Number of Qcache_free_memory = 0 xsec = 0
+Number of Qcache_queries_in_cache = 0 xsec = 0
+Number of Qcache_total_blocks = 0 xsec = 0
+------------------------------------ THREADS    --------------------------------------------
+Number of Threads_cached = 0
+Number of Threads_connected = 1
+Number of Threads_created = 1068
+Number of Threads_running = 1

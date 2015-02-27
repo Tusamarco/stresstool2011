@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="net/tc/utils/IniFile.java|net/tc/utils/xmlxsl/XmlXslUtils.java|com/mysql/stresstool/SynchronizedMap.java" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/stresstool2011"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
