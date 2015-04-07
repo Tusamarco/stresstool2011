@@ -1,11 +1,15 @@
 package net.tc.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.beans.*;
-
 import java.lang.reflect.*;
+
 import org.apache.commons.beanutils.BeanUtils;
+
 import java.sql.*;
+import java.sql.Date;
 import java.io.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
@@ -15,6 +19,8 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.ObjectOutputStream;
+
+import com.mysql.stresstool.StressTool;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
  public  class  Utility
@@ -181,6 +187,7 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 	cal.set(year, month, day);
 	cal.add(GregorianCalendar.DATE, numberOfDays);
 	
+	
 	String sMonth = (String)((cal.get(Calendar.MONTH)<10)?0+Integer.toString(cal.get(Calendar.MONTH)):Integer.toString(cal.get(Calendar.MONTH)));
 	String sDay = (String)((cal.get(Calendar.DAY_OF_MONTH)<10)?0+Integer.toString(cal.get(Calendar.DAY_OF_MONTH)):Integer.toString(cal.get(Calendar.DAY_OF_MONTH)));
 	
@@ -192,7 +199,35 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 	return finalDate;
 	
     } 
-    
+    public static String[] getOrderedDateFromDaysInterval(int year, int month, int day, int interval){
+    	String[] strDates = new String[2] ;
+    	String tmpDate = getDateFromDaysInterval(year,month,day,StressTool.getNumberFromRandom(interval).intValue());
+    	String tmpDate2 = getDateFromDaysInterval(year,month,day,StressTool.getNumberFromRandom(interval).intValue());
+    	
+    	 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+    	    java.util.Date date1=null;
+    	    java.util.Date date2=null;
+			try {
+				date1 = format.parse(tmpDate);
+				date2 = format.parse(tmpDate2);
+			}
+			catch (ParseException e) {
+				e.printStackTrace();
+			}
+    	    if (date1.compareTo(date2) <= 0) {
+    	    	strDates[0]=tmpDate;
+    	    	strDates[1]=tmpDate2;
+    	    	return strDates; 
+    	    }
+    	    else{
+    	    	strDates[1]=tmpDate;
+    	    	strDates[0]=tmpDate2;
+    	    	return strDates; 
+    	    	
+    	    }
+    	
+    }
     public static String getMonth()
     {
         Calendar calendar = new GregorianCalendar();

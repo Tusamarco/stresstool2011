@@ -388,9 +388,8 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 				select = select 
 						+ "from "+ primaryTable 
 						+ indexHint 
-						+" where "+ primaryTable +".date > " 
-						+ getRangeDate() + " and "
-						+ primaryTable +".date <" + getRangeDate() 
+						+" where "+ primaryTable +".date BETWEEN " 
+						+ getRangeDate() + " and " + getRangeDate() 
 						+ " limit " + this.getSelectLimit();
 			}
 			else if (this.getSelectFilterMethod().toLowerCase().equals("in")){
@@ -426,12 +425,13 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 								+ childJoinsConditions;
 			
 			if(this.getSelectFilterMethod().toLowerCase().equals("range")){
+				String[] arDates =  getOrderedRangeDate();
+				
 				select = select 
 							+ " where "
-							+ primaryTable 
-							+".date > " + getRangeDate() + " and "
-							+ primaryTable +".date <" + getRangeDate() 
-							+ " limit "+ this.getSelectLimit();
+							+ primaryTable +".date BETWEEN '" 
+							+ arDates[0] + "' and '" + arDates[1] 
+							+ "' limit "+ this.getSelectLimit();
 			}
 			else if (this.getSelectFilterMethod().toLowerCase().equals("in")){
 				String sPk ="";
@@ -951,6 +951,17 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 	    int interval = this.getDaystotal();
 	    
 	    return Utility.getDateFromDaysInterval(year, month, day, StressTool.getNumberFromRandom(interval).intValue());
+	    
+	}
+	private String[] getOrderedRangeDate() {
+	    // Fill the date value with some time date
+	    
+	    int year = this.getYearstart();
+	    int month = this.getMonthstart();
+	    int day = this.getDaystart();
+	    int interval = this.getDaystotal();
+	    
+	    return Utility.getOrderedDateFromDaysInterval(year, month, day, interval);
 	    
 	}
 

@@ -1363,7 +1363,7 @@ private static void showHelp() {
         return sb.toString();
     }
 
-    static Long getNumberFromRandom(int index)
+    public static Long getNumberFromRandom(int index)
     {
 //    	System.out.println(index);
         return new Long(rnd.nextInt(index));

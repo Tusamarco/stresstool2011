@@ -420,8 +420,7 @@ public  class RunnableQuerySelect  implements Runnable,RunnableSelectQueryInterf
 				select = select 
 							+ " where "
 							+ primaryTable 
-							+".a > " + pkStart + " and "
-							+ primaryTable +".a <" + pkEnds 
+							+".a BETWEEN " + pkStart + " and " + pkEnds 
 							+ " limit "+ this.getSelectLimit();
 			}
 			else if (this.getSelectFilterMethod().toLowerCase().equals("in")){
