@@ -49,27 +49,26 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryInterface {
-
+public  class RunnableQuerySelectPart  implements Runnable,RunnableQuerySelectInterface  {
 	private File queriesFileIn;
-//    Connection conn = null;
+//  Connection conn = null;
 
-    private Map jdbcUrlMap;
-    private boolean repeat = false;
-    private int repeatNumber = 0;
-    private int ID;
-    private boolean doLog = true;
-    private int sleepFor;
-    private String dbType="MySQL";
-    private String engine;
-    private long executionTime;
-    private MySQLStats mySQLStatistics;
-    private boolean active;
-    private boolean doSimplePk = false;    
-    private int iBatchSelect=200;
-    private String sqlQuery ;
-    private PrimaryKeyRangeDefiner pkRange;
-    private Map classConfig = null;
+  private Map jdbcUrlMap;
+  private boolean repeat = false;
+  private int repeatNumber = 0;
+  private int ID;
+  private boolean doLog = true;
+  private int sleepFor;
+  private String dbType="MySQL";
+  private String engine;
+  private long executionTime;
+  private MySQLStats mySQLStatistics;
+  private boolean active;
+  private boolean doSimplePk = false;    
+  private int iBatchSelect=200;
+  private String sqlQuery ;
+  private PrimaryKeyRangeDefiner pkRange;
+  private Map classConfig = null;
 	private int numberOfprimaryTables = 1;
 	private int numberOfSecondaryTables = 1;
 	private boolean useAutoIncrement = false;
@@ -89,20 +88,28 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 	private String partitionType = "range";
 	private boolean debug = false;
 
-	private static final ArrayList <String> CLASS_PARAMETERS = new ArrayList(Arrays.asList(
+	static final ArrayList <String> CLASS_PARAMETERS = new ArrayList(Arrays.asList(
 			"numberOfprimaryTables","numberOfSecondaryTables","useAutoIncrement", "numberOfJoinTables",
 			"numberOfIntervalKeys","selectFilterMethod","joinField","forceIndex","indexName","sleepSelect",
 			"selectLimit","yearstart","monthstart","daystart","daystotal","partitionType","debug"));
 
-    
-    public int getSelectLimit() {
+  
+  /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getSelectLimit()
+	 */
+  @Override
+	public int getSelectLimit() {
 		return selectLimit;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setSelectLimit(int)
+	 */
+	@Override
 	public void setSelectLimit(int selectLimit) {
 		this.selectLimit = selectLimit;
 	}
-
+   
 	public RunnableQuerySelectPart() {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -114,13 +121,11 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 
     }
 
-    /**
-     * When an object implementing interface <code>Runnable</code> is used to create a thread, starting the thread causes the object's <code>run</code> method to be called in
-     * that separately executing thread.
-     *
-     * @todo Implement this java.lang.Runnable method
-     */
-    public void run() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#run()
+	 */
+    @Override
+	public void run() {
 
         Connection conn = createConnection();        
 
@@ -552,6 +557,7 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 	/**
 	 * @Generate internal connection for launched thread one per thread no shared
 	 */
+	
 	private Connection createConnection() {
 		Connection conn = null;
         
@@ -579,126 +585,226 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
     public static void main(String[] args) {
     }
 
-    public void setQueriesFileIn(File queriesFileIn) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setQueriesFileIn(java.io.File)
+	 */
+    @Override
+	public void setQueriesFileIn(File queriesFileIn) {
         this.queriesFileIn = queriesFileIn;
     }
 
-    public void setJdbcUrl(Map jdbcUrlMapIn) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setJdbcUrl(java.util.Map)
+	 */
+    @Override
+	public void setJdbcUrl(Map jdbcUrlMapIn) {
     	this.jdbcUrlMap = (Map)jdbcUrlMapIn;
     }
 
 
-    public void setRepet(boolean repeat) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setRepet(boolean)
+	 */
+    @Override
+	public void setRepet(boolean repeat) {
         this.repeat = repeat;
     }
 
-    public void setRepeatNumber(int repeatNumber) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setRepeatNumber(int)
+	 */
+    @Override
+	public void setRepeatNumber(int repeatNumber) {
         this.repeatNumber = repeatNumber;
     }
 
-    public void setDoLog(boolean doLog) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDoLog(boolean)
+	 */
+    @Override
+	public void setDoLog(boolean doLog) {
         this.doLog = doLog;
     }
 
-    public void setSleepFor(int sleepFor) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setSleepFor(int)
+	 */
+    @Override
+	public void setSleepFor(int sleepFor) {
         this.sleepFor = sleepFor;
     }
 
-    public void setDbType(String dbType) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDbType(java.lang.String)
+	 */
+    @Override
+	public void setDbType(String dbType) {
         this.dbType = dbType;
     }
 
-    public void setEngine(String engine) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setEngine(java.lang.String)
+	 */
+    @Override
+	public void setEngine(String engine) {
         this.engine = engine;
     }
 
-    public void setExecutionTime(long executionTime) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setExecutionTime(long)
+	 */
+    @Override
+	public void setExecutionTime(long executionTime) {
         this.executionTime = executionTime;
     }
 
-    public void setID(int ID) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setID(int)
+	 */
+    @Override
+	public void setID(int ID) {
         this.ID = ID;
     }
 
-    public File getQueriesFileIn() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getQueriesFileIn()
+	 */
+    @Override
+	public File getQueriesFileIn() {
         return queriesFileIn;
     }
 
-    public String getJdbcUrl() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getJdbcUrl()
+	 */
+    @Override
+	public String getJdbcUrl() {
         return (String)jdbcUrlMap.get("jdbcUrl");
     }
 
-    public boolean isRepeat() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isRepeat()
+	 */
+    @Override
+	public boolean isRepeat() {
         return repeat;
     }
 
-    public int getRepeatNumber() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getRepeatNumber()
+	 */
+    @Override
+	public int getRepeatNumber() {
         return repeatNumber;
     }
 
-    public boolean isDoLog() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isDoLog()
+	 */
+    @Override
+	public boolean isDoLog() {
         return doLog;
     }
 
-    public int getSleepFor() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getSleepFor()
+	 */
+    @Override
+	public int getSleepFor() {
         return sleepFor;
     }
 
-    public String getDbType() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getDbType()
+	 */
+    @Override
+	public String getDbType() {
         return dbType;
     }
 
-    public String getEngine() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getEngine()
+	 */
+    @Override
+	public String getEngine() {
         return engine;
     }
 
-    public long getExecutionTime() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getExecutionTime()
+	 */
+    @Override
+	public long getExecutionTime() {
         return executionTime;
     }
 
-    public int getID() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getID()
+	 */
+    @Override
+	public int getID() {
         return ID;
     }
-    public MySQLStats getMySQLStatistics() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getMySQLStatistics()
+	 */
+    @Override
+	public MySQLStats getMySQLStatistics() {
         return mySQLStatistics;
     }
 
-    public boolean isActive() {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isActive()
+	 */
+    @Override
+	public boolean isActive() {
         return active;
     }
 
-    public void setMySQLStatistics(MySQLStats mySQLStatistics) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setMySQLStatistics(com.mysql.stresstool.MySQLStats)
+	 */
+    @Override
+	public void setMySQLStatistics(MySQLStats mySQLStatistics) {
         this.mySQLStatistics = mySQLStatistics;
     }
 
-    public void setActive(boolean active) {
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setActive(boolean)
+	 */
+    @Override
+	public void setActive(boolean active) {
         this.active = active;
     }
 
-	/**
-	 * @param doSimplePk the doSimplePk to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDoSimplePk(boolean)
 	 */
+	@Override
 	public void setDoSimplePk(boolean doSimplePk) {
 		this.doSimplePk = doSimplePk;
 	}
 
-	/**
-	 * @return the doSimplePk
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isDoSimplePk()
 	 */
+	@Override
 	public boolean isDoSimplePk() {
 		return doSimplePk;
 	}
 
-	/**
-	 * @param iBatchSelect the iBatchSelect to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setIBatchSelect(int)
 	 */
+	@Override
 	public void setIBatchSelect(int iBatchSelect) {
 		this.iBatchSelect = iBatchSelect;
 	}
 
-	/**
-	 * @return the iBatchSelect
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getIBatchSelect()
 	 */
+	@Override
 	public int getIBatchSelect() {
 		return iBatchSelect;
 	}
@@ -711,12 +817,17 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 		return sqlQuery;
 	}
 
-	/**
-	 * @param sqlQuery the sqlQuery to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setSqlQuery(java.lang.String)
 	 */
+	@Override
 	public void setSqlQuery(String sqlQuery) {
 		this.sqlQuery = sqlQuery;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#doSimplePk()
+	 */
 
 	@Override
 	public boolean doSimplePk() {
@@ -724,11 +835,19 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getDoDelete()
+	 */
+
 	@Override
 	public boolean getDoDelete() {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isOperationShort()
+	 */
 
 	@Override
 	public boolean isOperationShort() {
@@ -736,11 +855,19 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isUseBatchInsert()
+	 */
+
 	@Override
 	public boolean isUseBatchInsert() {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDoDelete(boolean)
+	 */
 
 	@Override
 	public void setDoDelete(boolean doDelete) {
@@ -748,11 +875,19 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setOperationShort(boolean)
+	 */
+
 	@Override
 	public void setOperationShort(boolean operationShort) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setUseBatchInsert(boolean)
+	 */
 
 	@Override
 	public void setUseBatchInsert(boolean useBatchInsert) {
@@ -760,145 +895,169 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 		
 	}
 	
-	/**
-	 * @return the joinField
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getJoinField()
 	 */
+	@Override
 	public String getJoinField() {
 		return joinField;
 	}
 
-	/**
-	 * @param joinField the joinField to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setJoinField(java.lang.String)
 	 */
+	@Override
 	public void setJoinField(String joinField) {
 		this.joinField = joinField;
 	}
 
-	/**
-	 * @return the numberOfprimaryTables
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getNumberOfprimaryTables()
 	 */
+	@Override
 	public int getNumberOfprimaryTables() {
 		return numberOfprimaryTables;
 	}
 
-	/**
-	 * @param numberOfprimaryTables the numberOfprimaryTables to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setNumberOfprimaryTables(int)
 	 */
+	@Override
 	public void setNumberOfprimaryTables(int numberOfprimaryTables) {
 		this.numberOfprimaryTables = numberOfprimaryTables;
 	}
 
-	/**
-	 * @return the numberOfSecondaryTables
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getNumberOfSecondaryTables()
 	 */
+	@Override
 	public int getNumberOfSecondaryTables() {
 		return numberOfSecondaryTables;
 	}
 
-	/**
-	 * @param numberOfSecondaryTables the numberOfSecondaryTables to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setNumberOfSecondaryTables(int)
 	 */
+	@Override
 	public void setNumberOfSecondaryTables(int numberOfSecondaryTables) {
 		this.numberOfSecondaryTables = numberOfSecondaryTables;
 	}
 
-	/**
-	 * @return the numberOfJoinTables
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getNumberOfJoinTables()
 	 */
+	@Override
 	public int getNumberOfJoinTables() {
 		return numberOfJoinTables;
 	}
 
-	/**
-	 * @param numberOfJoinTables the numberOfJoinTables to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setNumberOfJoinTables(int)
 	 */
+	@Override
 	public void setNumberOfJoinTables(int numberOfJoinTables) {
 		this.numberOfJoinTables = numberOfJoinTables;
 	}
 
-	/**
-	 * @return the numberOfIntervalKeys
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getNumberOfIntervalKeys()
 	 */
+	@Override
 	public int getNumberOfIntervalKeys() {
 		return numberOfIntervalKeys;
 	}
 
-	/**
-	 * @param numberOfIntervalKeys the numberOfIntervalKeys to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setNumberOfIntervalKeys(int)
 	 */
+	@Override
 	public void setNumberOfIntervalKeys(int numberOfIntervalKeys) {
 		this.numberOfIntervalKeys = numberOfIntervalKeys;
 	}
 
-	/**
-	 * @return the selectFilterMethod
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getSelectFilterMethod()
 	 */
+	@Override
 	public String getSelectFilterMethod() {
 		return selectFilterMethod;
 	}
 
-	/**
-	 * @param selectFilterMethod the selectFilterMethod to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setSelectFilterMethod(java.lang.String)
 	 */
+	@Override
 	public void setSelectFilterMethod(String selectFilterMethod) {
 		this.selectFilterMethod = selectFilterMethod;
 	}
 
-    /**
-	 * @return the forceIndex
+    /* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isForceIndex()
 	 */
+	@Override
 	public boolean isForceIndex() {
 		return forceIndex;
 	}
 
-	/**
-	 * @param forceIndex the forceIndex to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setForceIndex(boolean)
 	 */
+	@Override
 	public void setForceIndex(boolean forceIndex) {
 		this.forceIndex = forceIndex;
 	}
 
-	/**
-	 * @return the indexName
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getIndexName()
 	 */
+	@Override
 	public String getIndexName() {
 		return indexName;
 	}
 
-	/**
-	 * @param indexName the indexName to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setIndexName(java.lang.String)
 	 */
+	@Override
 	public void setIndexName(String indexName) {
 		this.indexName = indexName;
 	}
 
-	/**
-	 * @return the useAutoIncrement
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isUseAutoIncrement()
 	 */
+	@Override
 	public boolean isUseAutoIncrement() {
 		return useAutoIncrement;
 	}
 
-	/**
-	 * @param useAutoIncrement the useAutoIncrement to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setUseAutoIncrement(boolean)
 	 */
+	@Override
 	public void setUseAutoIncrement(boolean useAutoIncrement) {
 		this.useAutoIncrement = useAutoIncrement;
 	}
 
-	/**
-	 * @return the sleepSelect
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getSleepSelect()
 	 */
+	@Override
 	public int getSleepSelect() {
 		return sleepSelect;
 	}
 
-	/**
-	 * @param sleepSelect the sleepSelect to set
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setSleepSelect(int)
 	 */
+	@Override
 	public void setSleepSelect(int sleepSelect) {
 		this.sleepSelect = sleepSelect;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setClassConfiguration(java.util.Map)
+	 */
 
 	@Override
 	public void setClassConfiguration(Map mConfig) {
@@ -965,50 +1124,98 @@ public  class RunnableQuerySelectPart  implements Runnable,RunnableSelectQueryIn
 	    
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getYearstart()
+	 */
+	@Override
 	public int getYearstart() {
 		return yearstart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setYearstart(int)
+	 */
+	@Override
 	public void setYearstart(int yearstart) {
 		this.yearstart = yearstart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getMonthstart()
+	 */
+	@Override
 	public int getMonthstart() {
 		return monthstart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setMonthstart(int)
+	 */
+	@Override
 	public void setMonthstart(int monthstart) {
 		this.monthstart = monthstart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getDaystart()
+	 */
+	@Override
 	public int getDaystart() {
 		return daystart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDaystart(int)
+	 */
+	@Override
 	public void setDaystart(int daystart) {
 		this.daystart = daystart;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getDaystotal()
+	 */
+	@Override
 	public int getDaystotal() {
 		return daystotal;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDaystotal(int)
+	 */
+	@Override
 	public void setDaystotal(int daystotal) {
 		this.daystotal = daystotal;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#getPartitionType()
+	 */
+	@Override
 	public String getPartitionType() {
 		return partitionType;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setPartitionType(java.lang.String)
+	 */
+	@Override
 	public void setPartitionType(String partitionType) {
 		this.partitionType = partitionType;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#isDebug()
+	 */
+	@Override
 	public boolean isDebug() {
 		return debug;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mysql.stresstool.RunnableQuerySelectInterface#setDebug(boolean)
+	 */
+	@Override
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}

@@ -1020,9 +1020,9 @@ private static void showHelp() {
             if(aSelect > i)
             {
                 System.out.println("Starting Select:  " + i);
-                RunnableSelectQueryInterface qths = null;
+                RunnableQuerySelectInterface qths = null;
 				try {
-					qths = (RunnableSelectQueryInterface)Class.forName(selectDefaultClass).newInstance();
+					qths = (RunnableQuerySelectInterface)Class.forName(selectDefaultClass).newInstance();
 				} catch (InstantiationException e) {
 					System.out.println("ERROR === CLASS defined in configuration invalid or not correctly loaded \n CLASS = " + insertDefaultClass);
 					e.printStackTrace();
