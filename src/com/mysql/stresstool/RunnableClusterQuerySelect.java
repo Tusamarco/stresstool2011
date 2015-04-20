@@ -926,5 +926,11 @@ public  class RunnableClusterQuerySelect  implements Runnable,RunnableSelectQuer
 	 */
 	public void setJoinField(String joinField) {
 		this.joinField = joinField;
+	}
+
+	@Override
+	public void executeLocalExtensions(Connection conn) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

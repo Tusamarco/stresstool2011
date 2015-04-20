@@ -54,40 +54,10 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runnable, RunnableQueryInsertInterface{
+public  class RunnableQueryInsertPCH extends RunnableInsertBasic{
 
-	private File queriesFileIn;
-	//    Connection conn = null;
-
-	private Map jdbcUrlMap;
-	private boolean repeat = false;
-	private int repeatNumber = 0;
-	private int ID;
-	private boolean doLog = true;
-	private int sleepFor;
-	private boolean operationShort =false;
-	private String dbType="MySQL";
-	private String engine;
-	private long executionTime;
-	private boolean doDelete;
-	private boolean active=false;
-	private boolean useBatchInsert;
-	private MySQLStats mySQLStatistics;
-	private boolean doSimplePk = false;
-	private int iBatchInsert=50;
-	private boolean ignoreBinlog = false;
-	private Map classConfig = null;
-	private String lazyInsert1 = "" ;
-	private String lazyInsert2 = "";
-	private String lazyLongText= "";
-	private int numberOfprimaryTables = 1;
-	private int numberOfSecondaryTables = 1;
-	private boolean useAutoIncrement = false;
-	private int sleepWrite = 0;
-
-	private static final ArrayList <String> CLASS_PARAMETERS = new ArrayList(Arrays.asList(
-			"numberOfprimaryTables","numberOfSecondaryTables","useAutoIncrement","sleepWrite"));
-
+	String ServerId = null; 
+	
 	public RunnableQueryInsertPCH() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -105,263 +75,58 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#run()
 	 */
 	public void run() {
+			super.run();
+	}
+	
+	
+	/**
+	 * This method allow classes that extends the basic 
+	 * to query the database for local purpose
+	 * @param conn
+	 */
+	@Override
+	public void executeLocalExtensions(Connection conn) {
+		 Statement stmt = null;
+		 try{
+			stmt = conn.createStatement();
+			ResultSet rs = null;
+			
 
-		BufferedReader d = null;
-		Connection conn = null;
+		    SoftReference sf = new SoftReference(stmt.executeQuery("show global variables like 'hostname'"));
+		    rs = (ResultSet) sf.get();
+			rs.next();
+			ServerId = rs.getString(2);
 
-
-		if(conn == null)
-		{
-
-			try{
-				long execTime = 0;
-				int pkStart = 0 ;
-				int pkEnds = 0 ;
-				int intDeleteInterval = 0;
-				int intBlobInterval=0;
-				int intBlobIntervalLimit=StressTool.getNumberFromRandom(4).intValue();
-				ThreadInfo thInfo ;
-
-				long threadTimeStart = System.currentTimeMillis();
-				active = true;
-
-
-				thInfo = new ThreadInfo();
-				thInfo.setId(this.ID);
-				thInfo.setType("insert");
-				thInfo.setStatusActive(this.isActive());
-
-				StressTool.setInfo(this.ID,thInfo);
-				boolean lazy = false;
-				int lazyInterval =0;
-
-				for(int repeat = 0 ; repeat <= repeatNumber ; repeat++)
-				{
-					
-					try {
-						if(conn != null && !conn.isClosed()){
-							conn.close();
-						}
-					        SoftReference sf = new SoftReference(DriverManager.getConnection((String)jdbcUrlMap.get("jdbcUrl")));
-					        conn =  (Connection)sf.get(); 
-					} catch (SQLException ex) {
-						ex.printStackTrace();
-					}
-					Statement stmt = null;
-					//                ResultSet rs = null;
-					//                ResultSet rs2 = null;
-
-					conn.setAutoCommit(false);
-					stmt = conn.createStatement();
-					stmt.execute("SET AUTOCOMMIT=0");
-					ResultSet rs = null;
-					int ServerId = 0; 
-					String query = null;
-					ArrayList insert1 = null;
-					ArrayList insert2 = null;
-					int pk = 0 ;
-
-					{
-					    SoftReference sf = new SoftReference(stmt.executeQuery("show global variables like 'SERVER_ID'"));
-					    rs = (ResultSet) sf.get();
-					}
-					rs.next();
-					ServerId = rs.getInt(2);
-					
-					
-					if(repeat > 0 && lazyInterval < 500){
-						lazy = true;
-						++lazyInterval;
-					}
-					else{
-						lazy = false;
-						lazyInterval =0;
-					}
-
-
-					intBlobInterval = StressTool.getNumberFromRandom(10).intValue();
-//					intBlobInterval++;
-					//IMPLEMENTING lazy
-					
-					Vector v = null;
-					{
-					    SoftReference sf = new SoftReference(this.getTablesValues(lazy,ServerId));
-					    v =(Vector) sf.get();
-					}
-					insert1 = (ArrayList<String>) v.get(0);
-					insert2 = (ArrayList<String>) v.get(1);
-
-					//                    System.out.println(insert1);
-					//                    System.out.println(insert2);
-
-					//                    pk = ((Integer) v.get(2)).intValue();
-
-					int[] iLine = {0,0} ;
-
-					//                    pkStart = StressTool.getNumberFromRandom(2147483647).intValue();
-					//                    pkEnds = StressTool.getNumberFromRandom(2147483647).intValue();
-
-
-
-					try
-					{
-
-						long timeStart = System.currentTimeMillis();
-
-						if(this.ignoreBinlog)
-							stmt.execute("SET sql_log_bin=0");
-						stmt.execute("SET GLOBAL max_allowed_packet=10737418");
-
-						if(dbType.equals("MySQL") && !engine.toUpperCase().equals("BRIGHTHOUSE"))
-							stmt.execute("BEGIN");
-						else
-							stmt.execute("COMMIT");
-						//                                stmt.execute("SET TRANSACTION NAME 'TEST'");
-						{
-							Iterator<String> it = insert1.iterator();
-							while(it.hasNext()){
-								stmt.addBatch(it.next());
-							}
-						}
-
-						if(!this.doSimplePk){
-//						    System.out.println("Blob insert value :" + intBlobInterval);
-						    if(intBlobInterval > intBlobIntervalLimit )
-							{
-								Iterator<String> it = insert2.iterator();
-								while(it.hasNext()){
-									stmt.addBatch(it.next());
-								}
-//								intBlobInterval=0;
-
-							}
-						}
-
-						iLine = stmt.executeBatch();
-						stmt.clearBatch();
-						//                            System.out.println("Query1 = " + insert1);
-						//                            System.out.println("Query2 = " + insert2);
-						//                            stmt.execute("START TRANSACTION");
-						//                            stmt.execute(insert1);
-						//                            iLine = stmt.executeBatch();
-						//                            conn.commit();
-						long timeEnds = System.currentTimeMillis();
-						execTime = (timeEnds - timeStart);
-
-					}
-					catch (Exception sqle)
-					{
-						conn.rollback();
-						if(StressTool.getErrorLogHandler() != null){
-						    StressTool.getErrorLogHandler().appendToFile(("FAILED QUERY1==" + insert1));
-						    StressTool.getErrorLogHandler().appendToFile(("FAILED QUERY2==" + insert2));
-						    StressTool.getErrorLogHandler().appendToFile(sqle.toString());
-
-						}
-						else{
-						    sqle.printStackTrace();
-						    System.out.println("FAILED QUERY1==" + insert1);
-						    System.out.println("FAILED QUERY2==" + insert2);
-						    sqle.printStackTrace();
-						    System.exit(1);
-						}
-						//conn.close();
-						//this.setJdbcUrl(jdbcUrl);
-						//System.out.println("Query Insert TH RE-INIZIALIZING");
-
-
-					}
-					finally
-					{
-						//                        	conn.commit();
-						stmt.execute("COMMIT");
-						rs.close();
-						stmt.close();
-						rs = null;
-						stmt = null;
-						
-						//                            intDeleteInterval++;
-						if(doLog){
-
-							System.out.println("Query Insert TH = " + this.getID()
-									+ " Loop N = "+ repeat  + " " +iLine[0]+"|"+((iLine.length > 1)?iLine[1]:0)
-									+ " Exec Time(ms) =" + execTime
-									+ " Running = " + repeat + " of " + repeatNumber + " to go =" + (repeatNumber - repeat)
-									+ " Using Lazy=" + lazy);
-						}
-					}
-					thInfo.setExecutedLoops(repeat);
-                                        if(sleepFor > 0 || this.getSleepWrite()> 0)
-                                        {
-                                            if(this.getSleepWrite() > 0)
-                                            {
-                                            	Thread.sleep(getSleepWrite());
-                                            }
-                                            else
-                                            	Thread.sleep(sleepFor);
-                                        }
-
-                                        conn.close();
-                                        conn = null;
-				}
-
-				long threadTimeEnd = System.currentTimeMillis();
-				this.executionTime = (threadTimeEnd - threadTimeStart);
-				//                this.setExecutionTime(executionTime);
-				active = false;
-				//                System.out.println("Query Insert TH = " + this.getID() + " COMPLETED!  TOTAL TIME = " + execTime + "(ms) Sec =" + (execTime/1000));
-
-				thInfo.setExecutionTime(executionTime);
-				thInfo.setStatusActive(false);
-				StressTool.setInfo(this.ID,thInfo);
-				return;
-
-
-
+		}catch (SQLException sex){
+			sex.printStackTrace();
+		}finally{
+			try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			catch(Exception ex)
-			{
-				if(StressTool.getErrorLogHandler() != null){
-				    StressTool.getErrorLogHandler().appendToFile(ex.toString()+ "\n");
-				}
-				else
-				    ex.printStackTrace();
-				
-				try {
-					conn.close();
-					conn = null;
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					if(StressTool.getErrorLogHandler() != null){
-					    StressTool.getErrorLogHandler().appendToFile(e.toString()+ "\n");
-					    conn = null;
-					}
-					else
-					    e.printStackTrace();
-				}
-			}
-
-
-
+			
 		}
 
+		
 	}
 
 
-	Vector getTablesValues(boolean refresh, int ServerId) {
+	Vector getTablesValues(boolean refresh) {
 
 		String longtextFld = "";
 		boolean lazy = false;
 		int afld = 0;
 		long counterFld = 0 ;
 
-		if(refresh && !lazyInsert1.equals(""))
+		if(refresh && !getLazyInsert1().equals(""))
 		{
 			lazy = true;
-			longtextFld = lazyLongText;
+			longtextFld = getLazyLongText();
 		}
 		else{
-			if(operationShort)
+			if(isOperationShort())
 				longtextFld = StressTool.getStringFromRandom(254).substring(0,240);
 			else
 				longtextFld = StressTool.getStringFromRandom(40000);
@@ -381,39 +146,39 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 		String insert1Str = "";
 
 
-		if(dbType.endsWith("MySQL"))
+		if(getDbType().endsWith("MySQL"))
 		{
 			for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
 
-				if(this.doSimplePk){
+				if(this.isDoSimplePk()){
 					insert1.append("insert INTO tbtest" + iTable + " (uuid,a,serverid,b,c,counter,partitionid,strrecordtype) VALUES");
 
 				}
 				else{
 					insert1.append("insert INTO tbtest" + iTable + " (uuid,a,serverid,b,c,counter,partitionid,strrecordtype) VALUES");
 				}
-				if(this.useBatchInsert)
+				if(this.isUseBatchInsert())
 				{
 
 					insert1Str = "";
 					if(lazy){
 					    	
-					    	insert1Str = lazyInsert1;//.substring(0, lazyInsert1.length() - 2 ) + ServerId +")";
+					    	insert1Str = getLazyInsert1();//.substring(0, lazyInsert1.length() - 2 ) + ServerId +")";
 
 					}
 					else{
 
-						insert1Str ="\"" + (this.doSimplePk?longtextFld.substring(0, 6):longtextFld.substring(0, 99)) + "\",";
-						insert1Str = insert1Str  + "\"" + (this.doSimplePk?longtextFld.substring(0, 10):longtextFld.substring(0, 199)) + "\",";
+						insert1Str ="\"" + (this.isDoSimplePk()?longtextFld.substring(0, 6):longtextFld.substring(0, 99)) + "\",";
+						insert1Str = insert1Str  + "\"" + (this.isDoSimplePk()?longtextFld.substring(0, 10):longtextFld.substring(0, 199)) + "\",";
 						insert1Str = insert1Str  + StressTool.getNumberFromRandom(2147483647) *   StressTool.getNumberFromRandom(20) + ",";
 						insert1Str = insert1Str  + StressTool.getNumberFromRandom(20) + ",";
 						insert1Str = insert1Str  + "\"" + StressTool.getStringFromRandom(2) + "\"";
 						insert1Str = insert1Str  + ")";
-						lazyInsert1 = insert1Str;
+						setLazyInsert1(insert1Str);
 					}
 
 
-					for(int ibatch= 0 ; ibatch <=this.iBatchInsert; ibatch++ )
+					for(int ibatch= 0 ; ibatch <=this.getiBatchInsert(); ibatch++ )
 					{
 
 
@@ -422,11 +187,11 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 
 
 						if (ibatch > 0){
-							insert1.append(",(UUID()," + pk + "," + ServerId + ",");
+							insert1.append(",(UUID()," + pk + ",'" + ServerId + "',");
 						}
 						else
 						{	
-							insert1.append("(UUID()," + pk + "," + ServerId + ",");
+							insert1.append("(UUID()," + pk + ",'" + ServerId + "',");
 						}
 
 						insert1.append(insert1Str);
@@ -435,21 +200,21 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 				else
 				{
 					insert1Str = "";
-					insert1Str = insert1Str  + "(UUID()," + pk + "," + ServerId + ",";
+					insert1Str = insert1Str  + "(UUID()," + pk + ",'" + ServerId + "',";
 
 					if(lazy){
-					    insert1Str = lazyInsert1;//.substring(0, lazyInsert1.length() - 2 ) + ServerId +")";
+					    insert1Str = getLazyInsert1();//.substring(0, lazyInsert1.length() - 2 ) + ServerId +")";
 
 					}
 					else{
-						insert1Str = insert1Str  + "\"" + (this.doSimplePk?longtextFld.substring(0, 6):longtextFld.substring(0, 99)) + "\",";
-						insert1Str = insert1Str  + "\"" + (this.doSimplePk?longtextFld.substring(0, 10):longtextFld.substring(0, 199)) + "\",";
+						insert1Str = insert1Str  + "\"" + (this.isDoSimplePk()?longtextFld.substring(0, 6):longtextFld.substring(0, 99)) + "\",";
+						insert1Str = insert1Str  + "\"" + (this.isDoSimplePk()?longtextFld.substring(0, 10):longtextFld.substring(0, 199)) + "\",";
 						insert1Str = insert1Str  + StressTool.getNumberFromRandom(2147483647) *
 						StressTool.getNumberFromRandom(20) + ",";
 						insert1Str = insert1Str  + StressTool.getNumberFromRandom(20) + ",";
 						insert1Str = insert1Str  + "\"" + StressTool.getStringFromRandom(2) + "\"";
 						insert1Str = insert1Str  + ")";
-						lazyInsert1 = insert1Str;	                
+						setLazyInsert1(insert1Str);	                
 					}
 
 					insert1.append(insert1Str);
@@ -460,9 +225,9 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 				insert1.delete(0, insert1.length());
 			}
 		}
-		if(!this.doSimplePk)
+		if(!this.isDoSimplePk())
 		{
-			if(dbType.endsWith("MySQL"))
+			if(getDbType().endsWith("MySQL"))
 			{
 				String insert2Str = ""; 
 				String insert2bStr = "";
@@ -471,13 +236,13 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 					insert2Str = "";
 
 					insert2Str = insert2Str  +"insert INTO tbtest_child" + iTable + " (a,serverid,stroperation) VALUES(";
-					insert2Str = insert2Str  + pk + "," + ServerId + ",";
-					if(lazy && !lazyInsert2.equals("")){
-						insert2bStr = lazyInsert2;
+					insert2Str = insert2Str  + pk + ",'" + ServerId + "',";
+					if(lazy && !getLazyInsert2().equals("")){
+						insert2bStr = getLazyInsert2();
 					}
 					else{
-						lazyInsert2  =  "\"" + longtextFld + "\") ON DUPLICATE KEY UPDATE partitionid=0";
-						insert2bStr = lazyInsert2;
+						setLazyInsert2("\"" + longtextFld + "\")");
+						insert2bStr = getLazyInsert2();
 						//	        		insert2Str = insert2Str  + "\"" + longtextFld + "\") ON DUPLICATE KEY UPDATE partitionid=0";
 						//	        		lazyInsert2 = insert2Str;
 					}
@@ -499,278 +264,6 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 
 	}
 
-	public static void main(String[] args) {
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setQueriesFileIn(java.io.File)
-	 */
-	public void setQueriesFileIn(File queriesFileIn) {
-		this.queriesFileIn = queriesFileIn;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setJdbcUrl(java.lang.String)
-	 */
-	//    public void setJdbcUrl(Map jdbcUrl) {
-	//        this.jdbcUrl = jdbcUrl;
-	//        try {
-	//            this.conn= DriverManager.getConnection(jdbcUrl);
-	//        } catch (SQLException ex) {
-	//            ex.printStackTrace();
-	//        }
-	//    }
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setJdbcUrl(java.lang.String, java.lang.String)
-	 */
-	public void setJdbcUrl(Map jdbcUrlMap) {
-		this.jdbcUrlMap = jdbcUrlMap;
-		//        try {
-		//            if(jdbcUrlMap.get("dbType") != null &&  !((String)jdbcUrlMap.get("dbType")).equals("MySQL"))
-		//            {
-		//                this.conn=DriverManager.getConnection((String)jdbcUrlMap.get("dbType"),"test", "test");
-		//            }
-		//            else
-		//            this.conn= DriverManager.getConnection(jdbcUrl);
-		//        } catch (SQLException ex) {
-		//            ex.printStackTrace();
-		//        }
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setRepet(boolean)
-	 */
-	public void setRepet(boolean repeat) {
-		this.repeat = repeat;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setRepeatNumber(int)
-	 */
-	public void setRepeatNumber(int repeatNumber) {
-		this.repeatNumber = repeatNumber;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setDoLog(boolean)
-	 */
-	public void setDoLog(boolean doLog) {
-		this.doLog = doLog;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setSleepFor(int)
-	 */
-	public void setSleepFor(int sleepFor) {
-		this.sleepFor = sleepFor;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setOperationShort(boolean)
-	 */
-	public void setOperationShort(boolean operationShort) {
-		this.operationShort = operationShort;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setDbType(java.lang.String)
-	 */
-	public void setDbType(String dbType) {
-		this.dbType = dbType;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setEngine(java.lang.String)
-	 */
-	public void setEngine(String engine) {
-		this.engine = engine;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setExecutionTime(long)
-	 */
-	public void setExecutionTime(long executionTime) {
-		this.executionTime = executionTime;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setDoDelete(boolean)
-	 */
-	public void setDoDelete(boolean doDelete) {
-		this.doDelete = doDelete;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setActive(boolean)
-	 */
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setUseBatchInsert(boolean)
-	 */
-	public void setUseBatchInsert(boolean useBatchInsert) {
-		this.useBatchInsert = useBatchInsert;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setID(int)
-	 */
-	public void setID(int ID) {
-		this.ID = ID;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getQueriesFileIn()
-	 */
-	public File getQueriesFileIn() {
-		return queriesFileIn;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getJdbcUrl()
-	 */
-	public String getJdbcUrl() {
-		return (String)jdbcUrlMap.get("jdbcUrl");
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#isRepeat()
-	 */
-	public boolean isRepeat() {
-		return repeat;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getRepeatNumber()
-	 */
-	public int getRepeatNumber() {
-		return repeatNumber;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#isDoLog()
-	 */
-	public boolean isDoLog() {
-		return doLog;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getSleepFor()
-	 */
-	public int getSleepFor() {
-		return sleepFor;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#isOperationShort()
-	 */
-	public boolean isOperationShort() {
-		return operationShort;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getDbType()
-	 */
-	public String getDbType() {
-		return dbType;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getEngine()
-	 */
-	public String getEngine() {
-		return engine;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getExecutionTime()
-	 */
-	public long getExecutionTime() {
-		return executionTime;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getDoDelete()
-	 */
-	public boolean getDoDelete() {
-		return doDelete;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#isActive()
-	 */
-	public boolean isActive() {
-		return active;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#isUseBatchInsert()
-	 */
-	public boolean isUseBatchInsert() {
-		return useBatchInsert;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getID()
-	 */
-	public int getID() {
-		return ID;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getMySQLStatistics()
-	 */
-	public MySQLStats getMySQLStatistics() {
-		return mySQLStatistics;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setMySQLStatistics(com.mysql.stresstool.MySQLStats)
-	 */
-	public void setMySQLStatistics(MySQLStats mySQLStatistics) {
-		this.mySQLStatistics = mySQLStatistics;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setDoSimplePk(boolean)
-	 */
-	public void setDoSimplePk(boolean doSimplePk) {
-		this.doSimplePk = doSimplePk;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#doSimplePk()
-	 */
-	public boolean doSimplePk() {
-		return doSimplePk;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#setIBatchInsert(int)
-	 */
-	public void setIBatchInsert(int iBatchInsert) {
-		this.iBatchInsert = iBatchInsert;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.mysql.stresstool.RunnableQueryInsertInterface#getIBatchInsert()
-	 */
-	public int getIBatchInsert() {
-		return iBatchInsert;
-	}
-
-	public boolean isIgnoreBinlog() {
-		return ignoreBinlog;
-	}
-
-	public void setIgnoreBinlog(boolean ignoreBinlog) {
-		this.ignoreBinlog = ignoreBinlog;
-	}
-
-
 	@Override
 	public boolean createSchema(StressTool sTool) {
 
@@ -785,12 +278,12 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 		Statement stmt = null;
 
 		try {
-			if(jdbcUrlMap.get("dbType") != null &&  !((String)jdbcUrlMap.get("dbType")).equals("MySQL"))
+			if(getJdbcUrlMap().get("dbType") != null &&  !((String)getJdbcUrlMap().get("dbType")).equals("MySQL"))
 			{
-				conn=DriverManager.getConnection((String)jdbcUrlMap.get("dbType"),"test", "test");
+				conn=DriverManager.getConnection((String)getJdbcUrlMap().get("dbType"),"test", "test");
 			}
 			else
-				conn= DriverManager.getConnection((String)jdbcUrlMap.get("jdbcUrl"));
+				conn= DriverManager.getConnection((String)getJdbcUrlMap().get("jdbcUrl"));
 
 			conn.setAutoCommit(false);
 			stmt = conn.createStatement();
@@ -805,7 +298,7 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 				}
 				sb.append(" `a` int(11) NOT NULL,"); 
 				sb.append(" `uuid` char(36) NOT NULL,");
-				sb.append(" `serverid` int NOT NULL,");
+				sb.append(" `serverid` varchar(255) NOT NULL,");
 				sb.append(" `b` varchar(100) NOT NULL,");
 				sb.append(" `c` char(200)  NOT NULL,");
 				sb.append(" `counter` bigint(20) NULL, ");
@@ -816,7 +309,7 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 					sb.append(", PRIMARY KEY  (`autoInc`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid) ");
 				}
 				else{
-					if(!this.doSimplePk)
+					if(!this.isDoSimplePk())
 						sb.append(", PRIMARY KEY  (`uuid`),  INDEX `IDX_a` (a), INDEX `serverid` (serverid) ");
 					else 
 						sb.append(", PRIMARY KEY  (`a`),  INDEX `IDX_uuid` (uuid), INDEX `serverid` (serverid) ");
@@ -835,10 +328,10 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 			for(int iTable = 1 ; iTable <= this.getNumberOfSecondaryTables(); iTable++){
 				sb.append("CREATE TABLE IF NOT EXISTS tbtest_child" + iTable);
 				sb.append("(`a` int(11) NOT NULL,");
-				sb.append(" `serverid` int NOT NULL,");				
+				sb.append(" `serverid` varchar(255) NOT NULL,");				
 				sb.append("`bb` int(11) AUTO_INCREMENT NOT NULL,");
 				sb.append(" `partitionid` int NOT NULL DEFAULT 0,");
-				if(operationShort)
+				if(isOperationShort())
 					sb.append(" `stroperation` VARCHAR(254)  NULL,");
 				else
 					sb.append(" `stroperation` TEXT(41845)  NULL,");
@@ -856,7 +349,7 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 			String tbts2 = sb.toString();
 
 			System.out.println(tbts1);
-			if(!doSimplePk)
+			if(!isDoSimplePk())
 				System.out.println(tbts2);
 
 
@@ -869,7 +362,7 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 					stmt.execute("COMMIT");
 				}
 
-				if(!doSimplePk){
+				if(!isDoSimplePk()){
 					for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
 						System.out.println("**** Please wait DROP table tbtest_child" + iTable + " it could take a LOT of time *******");
 						stmt.execute(DropTables2+iTable);
@@ -897,7 +390,7 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 					stmt.execute(TruncateTables1+iTable);
 				}
 
-				if(!doSimplePk){
+				if(!isDoSimplePk()){
 					for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
 						System.out.println("**** Please wait TRUNCATE table tbtest_child" + iTable + " it could take a LOT of time *******");
 						stmt.execute(TruncateTables2+iTable);
@@ -926,120 +419,6 @@ public  class RunnableQueryInsertPCH extends RunnableInsertBasic implements Runn
 
 		}		
 
-	}
-
-
-	public String getLazyInsert1() {
-		return lazyInsert1;
-	}
-
-	public void setLazyInsert1(String lazyInsert1) {
-		this.lazyInsert1 = lazyInsert1;
-	}
-
-	public String getLazyInsert2() {
-		return lazyInsert2;
-	}
-
-	public void setLazyInsert2(String lazyInsert2) {
-		this.lazyInsert2 = lazyInsert2;
-	}
-
-	public String getLazyLongText() {
-		return lazyLongText;
-	}
-
-	public void setLazyLongText(String lazyLongText) {
-		this.lazyLongText = lazyLongText;
-	}
-
-	public int getNumberOfprimaryTables() {
-		return numberOfprimaryTables;
-	}
-
-	public void setNumberOfprimaryTables(int numberOfprimaryTables) {
-		this.numberOfprimaryTables = numberOfprimaryTables;
-	}
-
-	public int getNumberOfSecondaryTables() {
-		return numberOfSecondaryTables;
-	}
-
-	public void setNumberOfSecondaryTables(int numberOfSecondaryTables) {
-		this.numberOfSecondaryTables = numberOfSecondaryTables;
-	}
-
-	public boolean isDoSimplePk() {
-		return doSimplePk;
-	}
-
-	public void setRepeat(boolean repeat) {
-		this.repeat = repeat;
-	}
-
-
-	@Override
-	public void setClassConfiguration(Map mConfig) {
-		classConfig = mConfig;
-
-		for(int i = 0 ; i < CLASS_PARAMETERS.size() ; i++){
-			try {
-				String methodName = (String)CLASS_PARAMETERS.get(i);
-				methodName = methodName.substring(0,1).toUpperCase() + methodName.substring(1,methodName.length()); 
-				methodName = "set"+methodName;
-
-
-				String valueM = (String) classConfig.get(CLASS_PARAMETERS.get(i));
-//				System.out.println(methodName + " = " + valueM);
-
-				if(valueM != null){
-					if(valueM.equals("true") || valueM.equals("false")){
-						MethodUtils.invokeMethod(this,methodName,Boolean.parseBoolean(valueM));
-					}
-					else if(Utils.isNumeric(valueM)){
-
-						MethodUtils.invokeMethod(this,methodName,Integer.parseInt(valueM));
-					}
-					else
-						//					PropertyUtils.setProperty(this,methodName,valueM);
-						//							MethodUtils.setCacheMethods(false);
-						MethodUtils.invokeMethod(this,methodName,valueM);
-				}
-
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-	}
-
-	public boolean isUseAutoIncrement() {
-		return useAutoIncrement;
-	}
-
-	public void setUseAutoIncrement(boolean useAutoIncrement) {
-		this.useAutoIncrement = useAutoIncrement;
-	}
-
-	/**
-	 * @return the sleepWrite
-	 */
-	public int getSleepWrite() {
-		return sleepWrite;
-	}
-
-	/**
-	 * @param sleepWrite the sleepWrite to set
-	 */
-	public void setSleepWrite(int sleepWrite) {
-		this.sleepWrite = sleepWrite;
 	}
 
 

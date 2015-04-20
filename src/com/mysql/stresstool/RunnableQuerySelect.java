@@ -931,5 +931,11 @@ public  class RunnableQuerySelect  implements Runnable,RunnableSelectQueryInterf
 
 		}
 
+	}
+
+	@Override
+	public void executeLocalExtensions(Connection conn) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

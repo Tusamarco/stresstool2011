@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.commons.beanutils.MethodUtils;
 
@@ -664,5 +665,18 @@ public  class RunnableQueryDeleteNdb implements Runnable, RunnableQueryDeleteInt
 		public boolean doSimplePk() {
 			// TODO Auto-generated method stub
 			return false;
+		}
+
+		@Override
+		public void executeLocalExtensions(Connection conn) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Vector<Long> executeDeleteActions(Connection conn)
+				throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
 		}
       }

@@ -1,6 +1,7 @@
 package com.mysql.stresstool;
 
 import java.io.File;
+import java.sql.Connection;
 import java.util.Map;
 
 public interface RunnableQueryInterface {
@@ -88,6 +89,8 @@ public interface RunnableQueryInterface {
 	 * @return the doSimplePk
 	 */
 	public abstract boolean doSimplePk();
+
+	void executeLocalExtensions(Connection conn);
 
 
 	

@@ -1,7 +1,10 @@
 package com.mysql.stresstool;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
+import java.util.Vector;
 
 public interface RunnableQueryDeleteInterface extends RunnableQueryInterface {
 
@@ -82,5 +85,5 @@ public interface RunnableQueryDeleteInterface extends RunnableQueryInterface {
 	 * @return the doSimplePk
 	 */
 	public abstract boolean isDoSimplePk();
-
+	Vector<Long> executeDeleteActions(Connection conn) throws SQLException;
 }

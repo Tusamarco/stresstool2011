@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.sql.*;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * <p>Title: </p>
@@ -495,5 +496,18 @@ public  class RunnableMongoQueryDelete implements Runnable, RunnableQueryDeleteI
 		public boolean doSimplePk() {
 			// TODO Auto-generated method stub
 			return false;
+		}
+
+		@Override
+		public void executeLocalExtensions(Connection conn) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Vector<Long> executeDeleteActions(Connection conn)
+				throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
 		}
       }

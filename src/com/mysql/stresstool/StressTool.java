@@ -128,7 +128,7 @@ public class StressTool {
  */
     
     private static final ArrayList  lParameters = new ArrayList(Arrays.asList(
-    		"connectString","connUrl","createtable","dbType","doDelete","doBatch","doReport",
+    		"connectString","connUrl","createtable","dbType","doDelete","doBatch","doReport","dolog",
     		"doSimplePk","droptable","ignoreBinlog","operationShort","poolNumber",
     		"pctInsert","pctSelect","pctDelete","repeatNumber","tableEngine","truncate","numberOfprimaryTables","numberOfSecondaryTables",
     		"numberOfJoinTables","numberOfIntervalKeys","SelectClass","InsertClass","DeleteClass","logPathStats","logPathReport","logPathStatReport",

@@ -48,7 +48,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQuerySelectPCH  implements Runnable,RunnableSelectQueryInterface {
+public  class RunnableQuerySelectPCH  extends RunnableQuerySelectBasic {
 
 	private File queriesFileIn;
 //    Connection conn = null;
@@ -363,7 +363,7 @@ public  class RunnableQuerySelectPCH  implements Runnable,RunnableSelectQueryInt
 	 * @param select
 	 * @return
 	 */
-	private String generateSelectString(int pkStart, int pkEnds, String select) {
+	String generateSelectString(int pkStart, int pkEnds, String select) {
 
 		int numberOfRangeKey = this.getNumberOfIntervalKeys();
 		String joinAttribute = this.getJoinField();
@@ -546,7 +546,7 @@ public  class RunnableQuerySelectPCH  implements Runnable,RunnableSelectQueryInt
 	 * @return
 	 * Rerurn the interval of values for an IN syntax comma separated
 	 */
-	private String calculaltePK(int pkStart, int pkEnds, String sPk) {
+	protected String calculaltePK(int pkStart, int pkEnds, String sPk) {
 		int iloop =0; 
 		for(int iPk = pkStart; iPk <= pkEnds; iPk++ )
 		{
