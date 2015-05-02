@@ -10,9 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.Client;
+
 import net.tc.*;
 import net.tc.utils.SynchronizedMap;
 import net.tc.utils.Utility;
+import net.tc.utils.elastic.elasticProvider;
 import net.tc.utils.file.FileDataWriter;
 import net.tc.utils.file.FileHandler;
 
@@ -54,6 +59,7 @@ public class MySQLStats {
     private net.tc.utils.file.FileHandler logStatistics;
     private net.tc.utils.file.FileHandler logReport;
     private net.tc.utils.file.FileHandler logPathStatReport;
+    private Client clientElastic;
     
 	private int test;
 
@@ -279,7 +285,21 @@ public class MySQLStats {
             	}
             		
             	((FileDataWriter)this.logStatistics).setRecordData((net.tc.utils.SynchronizedMap) statusReport);
-            	
+            	/*
+            	 * If Elastic search is active then try to push info there
+            	 */
+            	try{
+            		if(this.getClientElastic() != null){
+            			IndexRequestBuilder requestElastic = getClientElastic().prepareIndex("stresstool", "status", ((Long)statusReport.get("TIME")).toString());
+            			requestElastic = elasticProvider.fillClientFromMap(requestElastic, statusReport);
+            			IndexResponse response = requestElastic
+            									.execute()
+            									.actionGet();
+            		}
+            	}
+            	catch(Throwable th){
+            		th.printStackTrace();
+            	}
             	
             }
             if(currVal > 1 && noHistory)
@@ -1091,6 +1111,14 @@ public class MySQLStats {
 
 	public void setInsertStatHeaders(boolean insertStatHeaders) {
 		this.insertStatHeaders = insertStatHeaders;
+	}
+
+	public Client getClientElastic() {
+		return clientElastic;
+	}
+
+	public void setClientElastic(Client clientElastic) {
+		this.clientElastic = clientElastic;
 	}
 
 

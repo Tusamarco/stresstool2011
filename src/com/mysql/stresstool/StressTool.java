@@ -29,9 +29,6 @@ import java.io.File;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.*;
-
-//import oracle.jdbc.driver.OracleDriver;
-
 import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,10 +40,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.elasticsearch.node.Node;
 import org.ini4j.*;
 
 import net.tc.*;
+import net.tc.utils.SynchronizedMap;
 import net.tc.utils.Utility;
+import net.tc.utils.elastic.elasticProvider;
 import net.tc.utils.file.FileHandler;
 
 
@@ -121,6 +121,9 @@ public class StressTool {
     private boolean insertStatHeaders;
     private static net.tc.utils.file.FileHandler errorLogHandler =null;
     private String errorLog ="/tmp/error_test_default.log";
+    private boolean hasElasticSearch = false;
+    private String elasticUrl;
+    private Node nodeElastic;
     
 /*
  * TODO: * Take out all the information about the configration and create a Configurator object
@@ -132,7 +135,7 @@ public class StressTool {
     		"doSimplePk","droptable","ignoreBinlog","operationShort","poolNumber",
     		"pctInsert","pctSelect","pctDelete","repeatNumber","tableEngine","truncate","numberOfprimaryTables","numberOfSecondaryTables",
     		"numberOfJoinTables","numberOfIntervalKeys","SelectClass","InsertClass","DeleteClass","logPathStats","logPathReport","logPathStatReport",
-    		"appendLogStat","appendLogReport","insertStatHeaders","errorLog","debug","onDuplicateKey"));
+    		"appendLogStat","appendLogReport","insertStatHeaders","errorLog","debug","onDuplicateKey","hasElasticSearch","elasticUrl"));
 
     
 //"sleepWrite","sleepSelect","sleepDelete" 
@@ -536,7 +539,23 @@ private static void showHelp() {
         this.mySQLStatistics = mySQLStatistics;
     }
 
-    public static void setThreadInfoMap(Map threadInfoMap) {
+    public boolean isHasElasticSearch() {
+		return hasElasticSearch;
+	}
+
+	public void setHasElasticSearch(boolean hasElasticSearch) {
+		this.hasElasticSearch = hasElasticSearch;
+	}
+
+	public String getElasticUrl() {
+		return elasticUrl;
+	}
+
+	public void setElasticUrl(String elasticUrl) {
+		this.elasticUrl = elasticUrl;
+	}
+
+	public static void setThreadInfoMap(Map threadInfoMap) {
     	threadInfoInsertMap = threadInfoMap;
     }
 
@@ -561,7 +580,15 @@ private static void showHelp() {
             StressTool.setErrorLogHandler(StressTool.openLogPathError(runningStress.getErrorLog(), runningStress.isAppendLogReport()));
             StressTool.getErrorLogHandler().appendToFile("Starting test at " + Utility.getTimestamp()+ "\n");
             runningStress.setMySQLStatistics(new MySQLStats(runningStress.connUrl));
-
+            /*
+             * If elastic is define then assign a client to the MySQL stat to push data there.
+             */
+            if(runningStress.isHasElasticSearch()){
+            	Map <String,String>confElastic = new SynchronizedMap(0);
+            	confElastic.put("URL", runningStress.getElasticUrl());
+            	
+            	runningStress.getMySQLStatistics().setClientElastic(elasticProvider.getClientTransporter(confElastic));
+            }
             runningStress.getMySQLStatistics().setNumberOfLoops(runningStress.repeatNumber);
             runningStress.getMySQLStatistics().setNumberOfThreads(runningStress.poolNumber);
             runningStress.getMySQLStatistics().setDoBatching(runningStress.doBatch);
@@ -791,9 +818,16 @@ private static void showHelp() {
         System.out.print("]\n");
 
         Map thInfoMapInsert = StressTool.getThreadInfoMap();
-        if(this.doReport)
+        if(this.doReport){
         	this.getMySQLStatistics().getStatus();
-
+        	/*
+        	 * Close the elastic client
+        	 */
+        	if(this.getMySQLStatistics().getClientElastic() != null){
+        		this.getMySQLStatistics().getClientElastic().close();
+        	}
+        }
+        
         {
         	Object[] itAll =  thInfoMapInsert.keySet().toArray() ;
 	        for(int i = 0 ; i < itAll.length ; i++)
@@ -1881,6 +1915,14 @@ private static void showHelp() {
   		public void setErrorLog(String errorLog) {
   		    this.errorLog = errorLog;
   		}
+
+		public Node getNodeElastic() {
+			return nodeElastic;
+		}
+
+		public void setNodeElastic(Node nodeElastic) {
+			this.nodeElastic = nodeElastic;
+		}
 
 }
 
