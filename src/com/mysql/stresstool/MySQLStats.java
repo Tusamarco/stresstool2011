@@ -15,6 +15,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
 import net.tc.*;
+import net.tc.utils.ObjectHandler;
 import net.tc.utils.SynchronizedMap;
 import net.tc.utils.Utility;
 import net.tc.utils.elastic.elasticProvider;
@@ -234,6 +235,7 @@ public class MySQLStats {
             rs = stmt.executeQuery("SHOW GLOBAL STATUS");
 
             String time = Utility.getTimestampForStats();
+            statusReport.put("AA_TIME",Utility.getTimestampForElastic());
             statusReport.put("TIMEEX",time);
             statusReport.put("TIME",new Long(System.currentTimeMillis()));
             statusReport.put("SERVERID", this.getSystemVariableByName("server_id", true));
@@ -243,9 +245,9 @@ public class MySQLStats {
             while(rs.next())
             {
                 String name = "";
-                String value = "";
+                Object value;
                 name = rs.getString("Variable_name");
-                value = rs.getString("Value");
+                value = ObjectHandler.convertString2Object((String)rs.getObject("Value"));
                 statusReport.put(name,value);
             }
             /**
@@ -261,12 +263,12 @@ public class MySQLStats {
                 while(rs.next())
                 {
                     String name = "";
-                    String value = "";
+                    Object value;
                     String id = "" ;
                     String block="";
                     String instance="";
                     name = rs.getString("counter_name");
-                    value = rs.getString("val");
+                    value = rs.getObject("val");
                     id = rs.getString("node_id"); 
                     block=rs.getString("block_name");
                     instance=rs.getString("block_instance");
@@ -291,17 +293,22 @@ public class MySQLStats {
             	try{
             		if(this.getClientElastic() != null){
             			IndexRequestBuilder requestElastic = getClientElastic().prepareIndex("stresstool", "status", ((Long)statusReport.get("TIME")).toString());
+            			String headElastic ="";
+            			//headElastic ="\"mappings\":{\"status\":{\"properties\":{\"AA_time\":\"type\":\"date\",\"format\":\"basic_date_time\"}}}";
+            			
             			requestElastic = elasticProvider.fillClientFromMap(requestElastic, statusReport);
             			IndexResponse response = requestElastic
             									.execute()
             									.actionGet();
             		}
+            	  
             	}
             	catch(Throwable th){
             		th.printStackTrace();
             	}
             	
             }
+            
             if(currVal > 1 && noHistory)
             	stressStatsCollector.setReport(2,statusReport);
             else
@@ -902,7 +909,8 @@ public class MySQLStats {
         {
             for(int i = 1 ; i < this.stressStatsCollector.size() ; i++)
             {
-               long curVal = Long.parseLong((String)((Map)stressStatsCollector.get(i)).get(varName));
+//               long curVal = Long.parseLong((String)((Map)stressStatsCollector.get(i)).get(varName));
+               long curVal = new Long((Long) ((Map)stressStatsCollector.get(i)).get(varName)).longValue();
                if(curVal > maxValue)
                    maxValue = curVal;
             }

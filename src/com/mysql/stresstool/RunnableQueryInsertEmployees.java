@@ -87,6 +87,16 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 		super.run();
 	}
 
+	/**
+	 * This method allow classes that extends the basic 
+	 * to query the database for local purpose
+	 * @param conn
+	 */
+	public void executeLocalExtensions(Connection conn) {
+		populateLocalInfo(conn);
+		
+	}
+
 
 	private void populateLocalInfo(Connection conn){
             try{
@@ -148,7 +158,7 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
         	/**
         	 * City/Country 
         	 */
-                sqlQuery = "Select ID, Name,CountryCode  from employees.City order by Name;"; 
+                sqlQuery = "Select ID, Name,CountryCode  from world.City order by Name;"; 
                 rs = stmt.executeQuery(sqlQuery);
                 while(rs.next()){
                     city.put(rs.getString(2), rs.getString(1)+"-"+rs.getString(3));
@@ -165,7 +175,7 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
             
             
 	}
-	
+	@Override 
 	Vector getTablesValues(boolean refresh) {
 
 		String longtextFld = "";

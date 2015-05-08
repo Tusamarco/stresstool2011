@@ -586,7 +586,6 @@ private static void showHelp() {
             if(runningStress.isHasElasticSearch()){
             	Map <String,String>confElastic = new SynchronizedMap(0);
             	confElastic.put("URL", runningStress.getElasticUrl());
-            	
             	runningStress.getMySQLStatistics().setClientElastic(elasticProvider.getClientTransporter(confElastic));
             }
             runningStress.getMySQLStatistics().setNumberOfLoops(runningStress.repeatNumber);
@@ -675,8 +674,10 @@ private static void showHelp() {
 //                this.getMySQLStatistics().getStatus();
                 Thread.sleep(1000);
                 
-                if(this.doReport)
+                if(this.doReport){
                 	this.getMySQLStatistics().getStatus();
+                	
+                }
                 
                 Map thInfoMapInsert = StressTool.getThreadInfoMap();
                 Map thInfoMapSelect = StressTool.getThreadInfoSelectMap();

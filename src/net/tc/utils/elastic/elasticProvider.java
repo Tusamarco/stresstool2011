@@ -43,21 +43,22 @@ public static Node getClientNode(){
 	 
  }
 
- public static IndexRequestBuilder fillClientFromMap(IndexRequestBuilder request,Map data){
+ public static IndexRequestBuilder fillClientFromMap( IndexRequestBuilder request,Map data){
 	 
 	    JSONObject source = new JSONObject();
 	    Iterator it =  data.keySet().iterator();
 	    String key;
-	    String value;
+	    Object value ="";
 	    while (it.hasNext()){
 	    	key = (String)it.next();
-	    	value = (String)String.valueOf(data.get(key)).toString();
+    		value =  data.get(key);
 	    	source.put(key, value);
+
 	    	
 	    }
 	    
 	    
-	    
+//    	System.out.println(source.toJSONString());	    
 	 	request.setSource(source.toJSONString());
 	 
 	 return request;

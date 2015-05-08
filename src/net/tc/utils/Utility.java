@@ -141,6 +141,38 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
     	return timeStamp;
     	
     }
+    
+    public static String getTimestampForElastic(){
+    	String timeStamp;
+        GregorianCalendar calendar = new GregorianCalendar();
+        
+        String year = new Integer(calendar.get(GregorianCalendar.YEAR)).toString();
+        
+        int m = calendar.get(GregorianCalendar.MONTH);
+        String month = new Integer(m).toString();
+        if(month.length()<2)
+        	month = "0"+month;
+        
+        int d = calendar.get(GregorianCalendar.DAY_OF_MONTH);
+        if(d == 0)
+    	   d = 1;
+        String day = new Integer(d).toString();
+        if(day.length()<2)
+            day = "0"+day;
+        
+        String hour = new Integer(calendar.get(GregorianCalendar.HOUR_OF_DAY)).toString();
+        if(hour.length() ==1) hour = "0" + hour;
+        
+        String minute = new Integer(calendar.get(GregorianCalendar.MINUTE)).toString();
+        if(minute.length() ==1) minute = "0" + minute; 
+        
+        String second = new Integer(calendar.get(GregorianCalendar.SECOND)).toString();
+        if(second.length() ==1) second = "0" + second; 
+        
+    	timeStamp = year +"/"+ month +"/" + day + " " + hour +":"+ minute +":"+ second ; 
+    	return timeStamp;
+    	
+    }
     /**
      * This function return the number of day existing in the given year and month
      * @param year

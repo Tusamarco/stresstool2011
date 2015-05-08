@@ -25,4 +25,22 @@ public class ObjectHandler
         return o2;
 
     }
+    public static Object convertString2Object(String in){
+    	
+    	try{
+    		if(in == "true" || in == "false"){
+    			return (Boolean)Boolean.parseBoolean(in);
+    		}
+    		else{
+    			return (Long)Long.parseLong(in);
+    		} 
+    		
+    	}
+    	catch(NumberFormatException ex){
+    		return (String) in;
+    		
+    	}
+    	
+    
+    }
 }
