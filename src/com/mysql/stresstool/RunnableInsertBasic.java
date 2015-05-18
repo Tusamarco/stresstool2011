@@ -271,17 +271,25 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 						//                                stmt.execute("SET TRANSACTION NAME 'TEST'");
 						{
 							Iterator<String> it = insert1.iterator();
+							String tmp ="";
 							while(it.hasNext()){
-								stmt.addBatch(it.next());
+								tmp = (String) it.next();
+								if(this.debug)
+									System.out.println(tmp);
+								stmt.addBatch(tmp);
 							}
 						}
 
 						if(!this.doSimplePk){
 							if(intBlobInterval > intBlobIntervalLimit )
 							{
+								String tmp ="";
 								Iterator<String> it = insert2.iterator();
 								while(it.hasNext()){
-									stmt.addBatch(it.next());
+									tmp = (String) it.next();									
+									if(this.debug)
+										System.out.println(tmp);
+									stmt.addBatch(tmp);
 								}
 								intBlobInterval=0;
 
@@ -427,7 +435,7 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 		}
 		else if(sqle.getErrorCode() > 0 && sqle.getErrorCode() != 1205  && lockRetry < 4) {
 		    	lockRetry++;
-		    	System.out.println("ERROR Found for thread = " + Thread.currentThread().getId() + " repeat N: " + lockRetry + " OF 3");		    
+		    	System.out.println("ERROR Found for thread = " + Thread.currentThread().getId() + " repeat N: " + lockRetry + " OF 3\n" + sqle.getLocalizedMessage());		    
 		    	
 		    	try {
 		    			iLine = executeSQL(stmt);

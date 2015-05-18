@@ -38,6 +38,8 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.UUID;
 
+import javax.management.InvalidApplicationException;
+
 import net.tc.utils.SynchronizedMap;
 import net.tc.utils.Utility;
 
@@ -64,7 +66,11 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 	private ArrayList <String> LastName = null;
 	private ArrayList <String> email = null;
 	private Map city = null;
-	private ArrayList country = null;
+	private ArrayList <String> country = null;
+	private ArrayList <String> departments = null;
+	private ArrayList <String> titles = null;
+	private Integer today = 0; 
+	private ArrayList <Long> emp_max = new ArrayList();
 		
 	public RunnableQueryInsertEmployees() {
 		try {
@@ -93,7 +99,38 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 	 * @param conn
 	 */
 	public void executeLocalExtensions(Connection conn) {
-		populateLocalInfo(conn);
+		if(today == 0 )
+			populateLocalInfo(conn);
+		try{
+            /**
+             * employees max - min    
+             */
+			    Long min = (long) 0;
+				ResultSet rs = null;
+				Statement stmt = null;
+	            conn.setAutoCommit(false);
+	            stmt = conn.createStatement(); 
+	            rs = stmt.executeQuery("select min(maxid) as min from tbtestmax ");
+                while(rs.next()){
+                	min=(Long) (rs.getLong(1));
+                    
+                }
+                if (min > 100){
+	                rs = stmt.executeQuery("select maxid as max, tablename from tbtestmax order by 2 ");
+	                while(rs.next()){
+	                	emp_max.add((Long) (rs.getLong(1)));
+	                    
+	                }
+                }
+                rs.close();
+                stmt.close();
+                rs =null;
+                stmt = null;
+			
+		}
+		catch(SQLException exq){
+			
+		}
 		
 	}
 
@@ -130,6 +167,8 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
         	LastName = new ArrayList();
         	email = new ArrayList();
         	city = new SynchronizedMap();
+        	departments = new ArrayList();
+        	titles = new ArrayList();
         	//ArrayList country = null;
            
                 sqlQuery = "Select distinct first_name from employees.employees order by first_name"; 
@@ -165,9 +204,36 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
                     
                 }
                 rs.close();
+        	/**
+        	 * departments 
+        	 */
+                sqlQuery = "SELECT dept_name FROM employees.departments order by 1;"; 
+                rs = stmt.executeQuery(sqlQuery);
+                while(rs.next()){
+                	departments.add(rs.getString(1));                    
+                }
+                rs.close();
+        	/**
+        	 * titles 
+        	 */
+                sqlQuery = "SELECT distinct title FROM employees.titles order by 1;"; 
+                rs = stmt.executeQuery(sqlQuery);
+                while(rs.next()){
+                	titles.add(rs.getString(1));                    
+                }
+                rs.close();
+                
+            /**
+             * Today    
+             */
+                sqlQuery = "select to_days(now()) as today;"; 
+                rs = stmt.executeQuery(sqlQuery);
+                while(rs.next()){
+                    today= (Integer) (rs.getInt(1));
+                    
+                }
+                rs.close();
                 stmt.close();
-                
-                
                 
             }
             catch(SQLException ex){ex.printStackTrace();}
@@ -219,7 +285,9 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 //		                 * +--------+------------+------------+-----------+--------+------------+---------+
 		                 
 				insert1.append("insert INTO tbtest" + iTable + " (emp_no,birth_date,first_name,last_name,gender,hire_date,city_id,CityName,CountryCode,UUID) VALUES");
-				
+				if(emp_max.size()  >0 
+						&& emp_max.get(iTable -1).intValue() > 10)
+						insert2.append("insert INTO tbtest_child" + iTable + " (emp_no,id,salary,from_date,to_date,dept_name,title,time) VALUES");
 
 				if(this.isUseBatchInsert())
 				{
@@ -233,8 +301,8 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					    String cityString  = (String)city.keySet().toArray()[StressTool.getNumberFromRandomMinMax(0, city.size()-1).intValue()];
 					    String[] cityN_ISO= ((String)city.get(cityString)).split("-");
 					    
-					    int fromDaysBirth = StressTool.getNumberFromRandomMinMax(712223, 735630).intValue();
-					    int fromDaysHire = StressTool.getNumberFromRandomMinMax(712223, 735630).intValue();
+					    int fromDaysBirth = StressTool.getNumberFromRandomMinMax(712223, today - 7300).intValue();
+					    int fromDaysHire = StressTool.getNumberFromRandomMinMax(fromDaysBirth + 7300, today).intValue();
 					    String gender ="";
 					    if (fromDaysBirth % 2 == 0) {
 						gender ="M";
@@ -243,7 +311,9 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					    }
 					    
 					    if (ibatch > 0){
-						insert1.append(",");
+							insert1.append(",");
+							if(emp_max.size() >0 && emp_max.get(iTable -1 ).intValue() > 10)
+								insert2.append(",");
 					    }
 					    insert1.append("(NULL,FROM_DAYS("+ fromDaysBirth +")," 
 						    + "'" + nameString + "',"
@@ -255,6 +325,21 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 						    + "'" + cityN_ISO[1] + "',"
 						    + "UUID())");
 
+					    if(emp_max.size() >0 && emp_max.get( iTable -1 ).intValue() > 10){
+					    	insert2.append("("
+					    		+ StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1).intValue()).intValue()
+					    		+ ", Null"
+					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+					    		+ ", " + "FROM_DAYS("+ (fromDaysHire + StressTool.getNumberFromRandom(fromDaysHire)) + ")"
+					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+					    		+ ", NULL"
+					    		+ ")");
+//					    	System.out.println(insert2.toString());
+						    		
+					    }
+					
 					}
 				}
 				else
@@ -264,15 +349,16 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 				    String cityString  = (String)city.keySet().toArray()[StressTool.getNumberFromRandomMinMax(0, city.size()-1).intValue()];
 				    String[] cityN_ISO= ((String)city.get(cityString)).split("-");
 
-				    int fromDaysBirth = StressTool.getNumberFromRandomMinMax(712223, 735630).intValue();
-				    int fromDaysHire = StressTool.getNumberFromRandomMinMax(712223, 735630).intValue();
+				    int fromDaysBirth = StressTool.getNumberFromRandomMinMax(712223, today - 7300).intValue();
+				    int fromDaysHire = StressTool.getNumberFromRandomMinMax(fromDaysBirth + 7300, today).intValue();
 				    String gender ="";
 				    if (fromDaysBirth % 2 == 0) {
-					gender ="M";
+				    	gender ="M";
 				    } else {
-					gender ="F";
+				    	gender ="F";
 				    }
-				    insert1.append("(NULL,FROM_DAYS("+ fromDaysBirth +")," 
+				    insert1.append("("
+				    	+ "NULL,FROM_DAYS("+ fromDaysBirth +")," 
 					    + "'" + nameString + "',"
 					    + "'" + lastNString + "',"
 					    + "'" + gender + "',"
@@ -280,47 +366,33 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					    + cityN_ISO[0] + ","
 					    + "'" + cityString + "',"
 					    + "'" + cityN_ISO[1] + "',"
-					    + "UUID())");
+					    + "UUID())"
+					    + "");
+
+				    if(emp_max.size() >0 && emp_max.get(iTable -1 ).intValue() > 10){
+				    		insert2.append("("
+					    		+ StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1 ).intValue()).intValue()
+					    		+ ", Null"
+					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+					    		+ ", " + "FROM_DAYS("+ (fromDaysHire + StressTool.getNumberFromRandom(fromDaysHire)) + ")"
+					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+					    		+ ", NULL"
+					    		+ ")");
+				    }
 
 
 				}
 				if(!insertList1.equals(""))  
 					insertList1.add(insert1.toString());
+				if(!insertList2.equals(""))  
+					insertList2.add(insert2.toString());
 
 				insert1.delete(0, insert1.length());
+				insert2.delete(0, insert2.length());
 			}
 		}
-//		if(!this.doSimplePk)
-//		{
-//			if(dbType.endsWith("MySQL"))
-//			{
-//				String insert2Str = ""; 
-//				String insert2bStr = "";
-//				String thisDate = getRangeDate();
-//				
-//				for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
-//					insert2Str = "";
-//					
-//					insert2Str = insert2Str  +"insert INTO tbtest_child" + iTable + " (a,date,stroperation) VALUES(";
-//					insert2Str = insert2Str  + pk + ",'" + thisDate + "',";
-//					if(lazy && !lazyInsert2.equals("")){
-//						insert2bStr = lazyInsert2;
-//					}
-//					else{
-//						lazyInsert2  =  "\"" + longtextFld + "\") ON DUPLICATE KEY UPDATE partitionid=0";
-//						insert2bStr = lazyInsert2;
-//						//	        		insert2Str = insert2Str  + "\"" + longtextFld + "\") ON DUPLICATE KEY UPDATE partitionid=0";
-//						//	        		lazyInsert2 = insert2Str;
-//					}
-//
-//					if(!insert2Str.equals("")) 
-//						insertList2.add(insert2Str + insert2bStr);
-//
-//				}
-//
-//			}
-//		}
-
 
 		v.add(0,insertList1);
 		v.add(1,insertList2);
@@ -332,7 +404,22 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 
 	@Override
 	public boolean createSchema(StressTool sTool) {
-
+		if(this.getNumberOfprimaryTables() != this.getNumberOfSecondaryTables()){
+			try {
+				throw new InvalidApplicationException("This Class require that:\n"
+						+ " Main and Child tables have the same number"
+						+ " in the configurarion"
+						+ "\nCheck your config file for:"
+						+ "numberOfprimaryTables=x \nnumberOfSecondaryTables=x");
+			} catch (InvalidApplicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		
 		// Custom schema creation this is the default for the stresstool but can be anything  
 		String DropTables1 = "Drop table IF EXISTS tbtest";
 		String DropTables2 = "Drop table IF EXISTS tbtest_child";
@@ -354,106 +441,20 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 			conn.setAutoCommit(false);
 			stmt = conn.createStatement();
 
-
-			StringBuffer sb = new StringBuffer();
-
-			for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
-				sb.append("CREATE TABLE IF NOT EXISTS tbtest" + iTable );
-				
-//				if (this.isUseAutoIncrement()){
-//					sb.append("`autoInc` bigint(11) AUTO_INCREMENT NOT NULL,");
-//				}
-//				sb.append(" `a` int(11) NOT NULL,"); 
-//				sb.append(" `uuid` char(36) NOT NULL,");
-//				sb.append(" `b` varchar(100) NOT NULL,");
-//				sb.append(" `c` char(200)  NOT NULL,");
-//				sb.append(" `counter` bigint(20) NULL, ");
-//				sb.append(" `time` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,");
-//				sb.append(" `partitionid` int NOT NULL DEFAULT 0,");
-//				sb.append(" `date` DATE NOT NULL,");
-//				sb.append(" `strrecordtype` char(3) NULL");
-//				if (this.isUseAutoIncrement()){
-//				    if(this.partitionType.equals("range")){
-//					sb.append(", PRIMARY KEY  (`autoInc`,`date`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid) ");
-//				    }
-//				    else{
-//					sb.append(", PRIMARY KEY  (`autoInc`,`partitionid`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid) ");
-//				    }
-//				}
-//				else{
-//					if(!this.doSimplePk)
-//					    if(this.partitionType.equals("range")){
-//					    	sb.append(", PRIMARY KEY  (`uuid`,`date`),  INDEX `IDX_a` (a) ");
-//					    }
-//					    else{
-//						sb.append(", PRIMARY KEY  (`uuid`,`partitionid`),  INDEX `IDX_a` (a) ");
-//					    }
-//					else{ 
-//					    if(this.partitionType.equals("range")){
-//						sb.append(", PRIMARY KEY  (`a`,`date`),  INDEX `IDX_uuid` (uuid) ");
-//					    }
-//					    else{
-//						sb.append(", PRIMARY KEY  (`a`,`partitionid`),  INDEX `IDX_uuid` (uuid) ");
-//					    }
-//					}
-//				}
-				sb.append("(`emp_no` int(4) unsigned AUTO_INCREMENT NOT NULL,`birth_date` date NOT NULL,`first_name` varchar(14) NOT NULL," +
-						"`last_name` varchar(16) NOT NULL,`gender` enum('M','F') NOT NULL,`hire_date` date NOT NULL," +
-						"`city_id` int(4) DEFAULT NULL,`CityName` varchar(150) DEFAULT NULL,`CountryCode` char(3) DEFAULT NULL," +
-						"`UUID` char(36) DEFAULT NULL, PRIMARY KEY (`emp_no`)) ");
-				
-				sb.append(" ENGINE="+ sTool.tableEngine) ;
-
-				if(!sb.toString().equals(""))
-					stmt.addBatch(sb.toString());
-
-				sb.delete(0, sb.length());
-			}
-			String tbts1 = sb.toString();
-
-
-			sb = new StringBuffer();
-			for(int iTable = 1 ; iTable <= this.getNumberOfSecondaryTables(); iTable++){
-				sb.append("CREATE TABLE IF NOT EXISTS tbtest_child" + iTable);
-				sb.append("(`a` int(11) NOT NULL,");
-				sb.append("`bb` int(11) AUTO_INCREMENT NOT NULL,");
-				sb.append(" `date` DATE NOT NULL,");
-				sb.append(" `partitionid` int NOT NULL DEFAULT 0,");
-				if(isOperationShort())
-					sb.append(" `stroperation` VARCHAR(254)  NULL,");
-				else
-					sb.append(" `stroperation` TEXT(41845)  NULL,");
-
-				sb.append(" `time` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP");
-				sb.append(", PRIMARY KEY  (`a`,`bb`), UNIQUE(`bb`)");
-				sb.append(") ENGINE="+ sTool.tableEngine);
-
-				if(!sb.toString().equals(""))
-					stmt.addBatch(sb.toString());
-
-				sb.delete(0, sb.length());
-
-			}
-			String tbts2 = sb.toString();
-
-			System.out.println(tbts1);
-			if(!isDoSimplePk())
-				System.out.println(tbts2);
-
-
 			if(sTool.droptable)
 			{
+				if(!isDoSimplePk()){
+					for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
+						System.out.println("**** Please wait DROP table tbtest_child" + iTable + " it could take a LOT of time *******");
+						stmt.execute(DropTables2+iTable);
+					}
+
 				System.out.println("****============================================================================*******");
 				for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
 					System.out.println("**** Please wait DROP table tbtest" + iTable + " it could take a LOT of time *******");
 					stmt.execute(DropTables1+iTable);
 				}
 
-				if(!isDoSimplePk()){
-					for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
-						System.out.println("**** Please wait DROP table tbtest_child" + iTable + " it could take a LOT of time *******");
-						stmt.execute(DropTables2+iTable);
-					}
 
 
 				}
@@ -463,8 +464,75 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 
 			}
 
-			if(sTool.createtable)
-				stmt.executeBatch();
+			if(sTool.createtable){			
+			
+
+				StringBuffer sb = new StringBuffer();
+				stmt.execute("DROP TABLE IF EXISTS tbtestmax");
+				stmt.execute("CREATE TABLE IF NOT EXISTS tbtestmax (`tablename` varchar(250) PRIMARY KEY, `maxid` int(11) unsigned) ENGINE="+ sTool.tableEngine );
+	
+				
+				for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+					sb.append("CREATE TABLE IF NOT EXISTS tbtest" + iTable );
+					
+					sb.append("(`emp_no` int(11) unsigned AUTO_INCREMENT NOT NULL,`birth_date` date NOT NULL,`first_name` varchar(14) NOT NULL," +
+							"`last_name` varchar(16) NOT NULL,`gender` enum('M','F') NOT NULL,`hire_date` date NOT NULL," +
+							"`city_id` int(4) DEFAULT NULL,`CityName` varchar(150) DEFAULT NULL,`CountryCode` char(3) DEFAULT NULL," +
+							"`UUID` char(36) DEFAULT NULL, PRIMARY KEY (`emp_no`)) ");
+					
+					sb.append(" ENGINE="+ sTool.tableEngine) ;
+	
+					if(!sb.toString().equals(""))
+						stmt.execute(sb.toString());
+	
+					sb.delete(0, sb.length());
+					stmt.execute("DROP TRIGGER IF EXISTS test.tbtest"+iTable+"_AFTER_INSERT;");
+					stmt.execute(" CREATE TRIGGER `tbtest"+ iTable +"_AFTER_INSERT` AFTER INSERT ON `tbtest"+iTable+"` FOR EACH ROW \n"
+							+ " BEGIN \n"
+							+ " DECLARE sqlcode INT DEFAULT 0; \n"
+							+ " DECLARE CONTINUE HANDLER FOR 1054 SET sqlcode = 1054; \n"
+							+ " DECLARE CONTINUE HANDLER FOR 1136 SET sqlcode = 1136; \n"
+							+ " SET @LASTINSERT=0; \n"
+							+ " SELECT LAST_INSERT_ID() INTO @LASTINSERT; \n"
+							+ " REPLACE INTO tbtestmax values('tbtest"+iTable+"',@LASTINSERT) ; \n"
+							+ " END ");
+
+					
+				}
+				String tbts1 = sb.toString();
+	
+				sb = new StringBuffer();
+				
+				for(int iTable = 1 ; iTable <= this.getNumberOfSecondaryTables(); iTable++){
+					sb.append("CREATE TABLE IF NOT EXISTS tbtest_child" + iTable);
+					sb.append("(`emp_no` int(11) unsigned NOT NULL,");
+					sb.append("`id` int(11) unsigned AUTO_INCREMENT NOT NULL,");
+					sb.append("`salary` int(11)  NOT NULL,");
+					sb.append(" `from_date` DATE NOT NULL,");
+					sb.append(" `to_date` DATE NOT NULL,");
+					sb.append(" `dept_name` VARCHAR(40)  NULL,");
+					sb.append(" `title` VARCHAR(50)  NULL,");
+					sb.append(" `time` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP");
+					sb.append(", PRIMARY KEY (emp_no,id, from_date)");
+					sb.append(", key `emp_no` (`emp_no`)");
+					sb.append(", UNIQUE `UK_is` (`id`)");
+					sb.append(", FOREIGN KEY (`emp_no`) REFERENCES `tbtest"+ iTable +"` (`emp_no`) ON DELETE CASCADE");
+					sb.append(") ENGINE="+ sTool.tableEngine);
+	
+					if(!sb.toString().equals(""))
+						stmt.execute(sb.toString());
+	
+					sb.delete(0, sb.length());
+	
+				}
+				String tbts2 = sb.toString();
+	
+				System.out.println(tbts1);
+				if(!isDoSimplePk())
+					System.out.println(tbts2);
+
+			}	
+
 
 
 			if(sTool.truncate)
