@@ -511,7 +511,7 @@ public  class RunnableQuerySelectBasic  implements Runnable,RunnableQuerySelectI
 	 * @return
 	 * check for the max value of the table tbtest1 and for the min value return an array of int where element 0 is MIN element 1 is MAX
 	 */
-	private int[] getMaxSelectValue(Connection conn) {
+	 int[] getMaxSelectValue(Connection conn) {
 		//return StressTool.getNumberFromRandom(2147483647).intValue();
 		String primaryTable = "tbtest" + StressTool.getNumberFromRandomMinMax(1, getNumberOfprimaryTables());
 		

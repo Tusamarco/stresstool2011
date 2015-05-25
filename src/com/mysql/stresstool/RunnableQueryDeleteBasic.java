@@ -91,10 +91,10 @@ public  class RunnableQueryDeleteBasic implements Runnable, RunnableQueryDeleteI
 	
 	private int NumberOfSecondaryTables = 0 ; 
 	private int NumberOfprimaryTables =0 ;
-
+	private boolean useFK = false;
 
 	private static final ArrayList <String> CLASS_PARAMETERS = new ArrayList(Arrays.asList(
-			"numberOfprimaryTables","numberOfSecondaryTables","deleterowmaxpct", "deleterowsinterval","selectLimit"));
+			"numberOfprimaryTables","numberOfSecondaryTables","deleterowmaxpct", "deleterowsinterval","selectLimit","useFK"));
 
 
 	public RunnableQueryDeleteBasic() {
@@ -650,6 +650,14 @@ public  class RunnableQueryDeleteBasic implements Runnable, RunnableQueryDeleteI
 	 */
 	public void setDeleterowsinterval(int deleterowsinterval) {
 		this.deleterowsinterval = deleterowsinterval;
+	}
+
+	public boolean isUseFK() {
+		return useFK;
+	}
+
+	public void setUseFK(boolean useFK) {
+		this.useFK = useFK;
 	}
 
 }

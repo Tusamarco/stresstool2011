@@ -6,7 +6,7 @@ public class Utils {
 {  
 	 try  
 	 {  
-	    int i = Integer.parseInt(str);  
+	    long i = Long.parseLong(str);  
 	}  
 	catch(NumberFormatException nfe)  
 	{  
@@ -14,6 +14,19 @@ public class Utils {
 	}  
 	return true;  
 }  
+ public static boolean isNumeric(Object obj)  
+{  
+	 try  
+	 {  
+	    long i = new Long((Long) obj);  
+	}  
+	catch(NumberFormatException nfe)  
+	{  
+		return false;  
+	}  
+	return true;  
+}  
+
  public static boolean isDouble(String str)  
  {  
  	 try  

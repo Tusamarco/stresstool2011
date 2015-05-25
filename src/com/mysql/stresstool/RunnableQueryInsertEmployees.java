@@ -71,6 +71,8 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 	private ArrayList <String> titles = null;
 	private Integer today = 0; 
 	private ArrayList <Long> emp_max = new ArrayList();
+	Map tableEmpNo = new SynchronizedMap(0);
+	
 		
 	public RunnableQueryInsertEmployees() {
 		try {
@@ -105,6 +107,7 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
             /**
              * employees max - min    
              */
+				ArrayList<employeeShort> rowValueempNo = new ArrayList();
 			    Long min = (long) 0;
 				ResultSet rs = null;
 				Statement stmt = null;
@@ -115,14 +118,33 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
                 	min=(Long) (rs.getLong(1));
                     
                 }
-                if (min > 100){
+                rs.close();
+               
+                if (min > 1){
+                	emp_max.clear();
 	                rs = stmt.executeQuery("select maxid as max, tablename from tbtestmax order by 2 ");
 	                while(rs.next()){
 	                	emp_max.add((Long) (rs.getLong(1)));
 	                    
 	                }
+	                
+	                for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+	                	
+	                	String sql = "select emp_no,to_days(hire_date) from tbtest" + iTable + " where linked=0 order by emp_no limit "+ this.getIBatchInsert();
+	                	rs = stmt.executeQuery(sql);
+	                	employeeShort rv = null;
+	                	while(rs.next()){
+	                		rv = new employeeShort(rs.getLong(1),rs.getLong(2));
+	                		rowValueempNo.add(rv);
+	                	}
+	                	tableEmpNo.put("tbtest"+iTable, rowValueempNo);
+	                	rs.close();
+	                }
+	                
+//	                 update tbtest1 join tbtest_child1 on tbtest1.emp_no=tbtest_child1.emp_no set linked=1 where linked
                 }
-                rs.close();
+                if(!rs.isClosed())
+                		rs.close();
                 stmt.close();
                 rs =null;
                 stmt = null;
@@ -267,6 +289,7 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 
 		StringBuffer insert1 = new StringBuffer();
 		StringBuffer insert2 = new StringBuffer();
+		StringBuffer insert3 = new StringBuffer();
 		//        String uuid = UUID.randomUUID().toString();
 		ArrayList <String> insertList1 = new ArrayList();
 		ArrayList <String> insertList2 = new ArrayList();
@@ -285,9 +308,9 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 //		                 * +--------+------------+------------+-----------+--------+------------+---------+
 		                 
 				insert1.append("insert INTO tbtest" + iTable + " (emp_no,birth_date,first_name,last_name,gender,hire_date,city_id,CityName,CountryCode,UUID) VALUES");
-				if(emp_max.size()  >0 
-						&& emp_max.get(iTable -1).intValue() > 10)
-						insert2.append("insert INTO tbtest_child" + iTable + " (emp_no,id,salary,from_date,to_date,dept_name,title,time) VALUES");
+				if(tableEmpNo.size()  >0 )
+						insert2.append("insert INTO tbtest_child" + iTable + " (emp_no,id,salary,from_date,to_date,dept_name,title) VALUES");
+				insert3.append(0);
 
 				if(this.isUseBatchInsert())
 				{
@@ -312,8 +335,6 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					    
 					    if (ibatch > 0){
 							insert1.append(",");
-							if(emp_max.size() >0 && emp_max.get(iTable -1 ).intValue() > 10)
-								insert2.append(",");
 					    }
 					    insert1.append("(NULL,FROM_DAYS("+ fromDaysBirth +")," 
 						    + "'" + nameString + "',"
@@ -325,25 +346,58 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 						    + "'" + cityN_ISO[1] + "',"
 						    + "UUID())");
 
-					    if(emp_max.size() >0 && emp_max.get( iTable -1 ).intValue() > 10){
-					    	insert2.append("("
-					    		+ StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1).intValue()).intValue()
-					    		+ ", Null"
-					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
-					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
-					    		+ ", " + "FROM_DAYS("+ (fromDaysHire + StressTool.getNumberFromRandom(fromDaysHire)) + ")"
-					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
-					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
-					    		+ ", NULL"
-					    		+ ")");
+//					    if(emp_max.size() >0 && emp_max.get( iTable -1 ).intValue() > 10){
+//					    	Integer emp_no = StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1).intValue()).intValue();
+//					    	insert3.append(","+ emp_no);
+//					    	insert2.append("("
+//					    		+ emp_no
+//					    		+ ", Null"
+//					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+//					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+//					    		+ ", " + "FROM_DAYS("+ StressTool.getNumberFromRandomMinMax(fromDaysHire,737060) + ")"
+//					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+//					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+//					    		+ ")");
+					    	
 //					    	System.out.println(insert2.toString());
 						    		
-					    }
+//					    }
 					
 					}
+				    if(tableEmpNo.size() > 0){
+				    	ArrayList<employeeShort> rowValueempNo = (ArrayList) tableEmpNo.get("tbtest"+iTable);
+				    	Iterator it = rowValueempNo.iterator();
+				    	int iLinked =0;
+				    	while(it.hasNext()){
+				    		employeeShort rv = (employeeShort)it.next();
+				    		Long emp_no = rv.getEmpNo();
+				    		Long fromDaysHire = rv.getHiredDateDay();
+					    	if(iLinked > 0){
+					    		insert2.append(",");
+					    	}
+					    	else if(iLinked > 0 
+					    			&& iLinked > getIBatchInsert()){
+					    		break;
+					    	}
+					    	insert3.append(","+ emp_no);
+				    		insert2.append("("
+						    		+ emp_no
+						    		+ ", Null"
+						    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+						    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+						    		+ ", " + "FROM_DAYS("+ StressTool.getNumberFromRandomMinMax(fromDaysHire.intValue(),737060) + ")"
+						    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+						    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+						    		+ ")");
+				    		iLinked++;
+				    	}
+				    	
+				    }	
+
 				}
 				else
 				{
+				    {
 				    String nameString = Name.get(StressTool.getNumberFromRandomMinMax(0, Name.size()-1).intValue());					
 				    String lastNString = LastName.get(StressTool.getNumberFromRandomMinMax(0, LastName.size()-1).intValue());
 				    String cityString  = (String)city.keySet().toArray()[StressTool.getNumberFromRandomMinMax(0, city.size()-1).intValue()];
@@ -368,29 +422,66 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					    + "'" + cityN_ISO[1] + "',"
 					    + "UUID())"
 					    + "");
-
-				    if(emp_max.size() >0 && emp_max.get(iTable -1 ).intValue() > 10){
-				    		insert2.append("("
-					    		+ StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1 ).intValue()).intValue()
-					    		+ ", Null"
-					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
-					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
-					    		+ ", " + "FROM_DAYS("+ (fromDaysHire + StressTool.getNumberFromRandom(fromDaysHire)) + ")"
-					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
-					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
-					    		+ ", NULL"
-					    		+ ")");
 				    }
+				    
+				    if(tableEmpNo.size() > 0){
+				    	ArrayList<employeeShort> rowValueempNo = (ArrayList) tableEmpNo.get("tbtest"+iTable);
+				    	Iterator it = rowValueempNo.iterator();
+				    	int iLinked =0;
+				    	while(it.hasNext()){
+				    		employeeShort rv = (employeeShort)it.next();
+				    		Long emp_no = rv.getEmpNo();
+				    		Long fromDaysHire = rv.getHiredDateDay();
+					    	if(iLinked > 0){
+					    		insert2.append(",");
+					    	}
+					    	else if(iLinked > 0 
+					    			&& iLinked > getIBatchInsert()){
+					    		break;
+					    	}
+					    	insert3.append(","+ emp_no);
+				    		insert2.append("("
+						    		+ emp_no
+						    		+ ", Null"
+						    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+						    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+						    		+ ", " + "FROM_DAYS("+ StressTool.getNumberFromRandomMinMax(fromDaysHire.intValue(),737060) + ")"
+						    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+						    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+						    		+ ")");
+				    		iLinked++;
+				    	}
+				    	
+				    }	
+
+//				    if(emp_max.size() >0 && emp_max.get(iTable -1 ).intValue() > 10){
+//				    	Integer emp_no = StressTool.getNumberFromRandomMinMax(1, emp_max.get(iTable -1).intValue()).intValue();
+//				    	insert3.append(","+ emp_no);
+//				    	insert2.append("("
+//				    			+ emp_no
+//					    		+ ", Null"
+//					    		+ ", " + StressTool.getNumberFromRandomMinMax(1000, 1000000).intValue()
+//					    		+ ", " + "FROM_DAYS("+ fromDaysHire + ")"
+//					    		+ ", " + "FROM_DAYS("+ StressTool.getNumberFromRandomMinMax(fromDaysHire,737060) + ")"
+//					    		+ ", '" + departments.get(StressTool.getNumberFromRandomMinMax(0, departments.size()).intValue()) + "'"
+//					    		+ ", '" + titles.get(StressTool.getNumberFromRandomMinMax(0, titles.size()).intValue()) + "'"
+//					    		+ ")");
+//				    }
 
 
 				}
 				if(!insertList1.equals(""))  
 					insertList1.add(insert1.toString());
-				if(!insertList2.equals(""))  
-					insertList2.add(insert2.toString());
+				if(!insertList2.equals("")){
+					if(!insert2.toString().equals("")){
+						String add_update=" ;update tbtest" +iTable+ " set linked=1 where emp_no in("+insert3.toString()+");";
+						insertList2.add(insert2.toString() + add_update);
+					}
+				}
 
 				insert1.delete(0, insert1.length());
 				insert2.delete(0, insert2.length());
+				insert3.delete(0, insert3.length());
 			}
 		}
 
@@ -478,7 +569,13 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 					sb.append("(`emp_no` int(11) unsigned AUTO_INCREMENT NOT NULL,`birth_date` date NOT NULL,`first_name` varchar(14) NOT NULL," +
 							"`last_name` varchar(16) NOT NULL,`gender` enum('M','F') NOT NULL,`hire_date` date NOT NULL," +
 							"`city_id` int(4) DEFAULT NULL,`CityName` varchar(150) DEFAULT NULL,`CountryCode` char(3) DEFAULT NULL," +
-							"`UUID` char(36) DEFAULT NULL, PRIMARY KEY (`emp_no`)) ");
+							"`UUID` char(36) DEFAULT NULL, `linked` tinyint(1) NOT NULL DEFAULT 0, "
+							+ "`time_create` timestamp NOT NULL default CURRENT_TIMESTAMP, "
+							+ "`time_update` timestamp NOT NULL default CURRENT_TIMESTAMP  on update CURRENT_TIMESTAMP, "
+							+ " PRIMARY KEY (`emp_no`)"
+							+ ", KEY `idx_linked` (`linked`)"
+							+ ", KEY `time_created_up` (`time_create`,time_update)"
+							+ ")");
 					
 					sb.append(" ENGINE="+ sTool.tableEngine) ;
 	
@@ -505,14 +602,15 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 				
 				for(int iTable = 1 ; iTable <= this.getNumberOfSecondaryTables(); iTable++){
 					sb.append("CREATE TABLE IF NOT EXISTS tbtest_child" + iTable);
-					sb.append("(`emp_no` int(11) unsigned NOT NULL,");
-					sb.append("`id` int(11) unsigned AUTO_INCREMENT NOT NULL,");
-					sb.append("`salary` int(11)  NOT NULL,");
-					sb.append(" `from_date` DATE NOT NULL,");
-					sb.append(" `to_date` DATE NOT NULL,");
-					sb.append(" `dept_name` VARCHAR(40)  NULL,");
-					sb.append(" `title` VARCHAR(50)  NULL,");
-					sb.append(" `time` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP");
+					sb.append("(`emp_no` int(11) unsigned NOT NULL");
+					sb.append(",`id` int(11) unsigned AUTO_INCREMENT NOT NULL");
+					sb.append(", `salary` int(11)  NOT NULL");
+					sb.append(", `from_date` DATE NOT NULL");
+					sb.append(", `to_date` DATE NOT NULL");
+					sb.append(", `dept_name` VARCHAR(40)  NULL");
+					sb.append(", `title` VARCHAR(50)  NULL");
+					sb.append(", `time_create` timestamp NOT NULL default CURRENT_TIMESTAMP");
+					sb.append(", `time_changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP");
 					sb.append(", PRIMARY KEY (emp_no,id, from_date)");
 					sb.append(", key `emp_no` (`emp_no`)");
 					sb.append(", UNIQUE `UK_is` (`id`)");
@@ -538,18 +636,20 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 			if(sTool.truncate)
 			{
 				System.out.println("****============================================================================*******");
-
-				for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
-					System.out.println("**** Please wait TRUNCATE table tbtest" + iTable + " it could take a LOT of time *******");
-					stmt.execute(TruncateTables1+iTable);
-				}
-
 				if(!isDoSimplePk()){
 					for(int iTable = 1; iTable <= this.getNumberOfSecondaryTables(); iTable++){
 						System.out.println("**** Please wait TRUNCATE table tbtest_child" + iTable + " it could take a LOT of time *******");
 						stmt.execute(TruncateTables2+iTable);
 					}
 				}
+
+				for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+					System.out.println("**** Please wait TRUNCATE table tbtest" + iTable + " it could take a LOT of time *******");
+					stmt.execute("SET FOREIGN_KEY_CHECKS=0");
+					stmt.execute(TruncateTables1+iTable);
+					stmt.execute("SET FOREIGN_KEY_CHECKS=1");
+				}
+
 				System.out.println("**** TRUNCATE finish *******");
 				System.out.println("****============================================================================*******");
 
@@ -577,4 +677,31 @@ public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
 
 
 
+}
+class employeeShort{
+	Long hiredDateDay = new Long(0);
+	Long empNo = new Long(0);
+	
+	public employeeShort(Long empNo, Long hireDateDay) {
+		this.hiredDateDay = hireDateDay;
+		this.empNo = empNo;
+	}
+
+	public Long getHiredDateDay() {
+		return hiredDateDay;
+	}
+
+	public void setHiredDateDay(Long hiredDateDay) {
+		this.hiredDateDay = hiredDateDay;
+	}
+
+	public Long getEmpNo() {
+		return empNo;
+	}
+
+	public void setEmpNo(Long empNo) {
+		this.empNo = empNo;
+	}
+	
+		
 }

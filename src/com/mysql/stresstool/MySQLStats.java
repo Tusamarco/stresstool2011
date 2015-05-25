@@ -17,6 +17,7 @@ import org.elasticsearch.client.Client;
 import net.tc.*;
 import net.tc.utils.ObjectHandler;
 import net.tc.utils.SynchronizedMap;
+import net.tc.utils.Text;
 import net.tc.utils.Utility;
 import net.tc.utils.elastic.elasticProvider;
 import net.tc.utils.file.FileDataWriter;
@@ -929,10 +930,11 @@ public class MySQLStats {
             if (stressStatsCollector != null &&
             		stressStatsCollector.size() > 0) {
             	try{
-                 endValue = Long.parseLong((String)this.endReport.get(
-                        varName));
-                 startValue = Long.parseLong((String)this.startReport.get(
-                        varName));
+            		if(Text.isNumeric(this.endReport.get(varName)))
+            			endValue = (Long)this.endReport.get(varName);
+
+            		if(Text.isNumeric(this.startReport.get(varName)))
+            			startValue = (Long)this.startReport.get(varName);
             	}
             	catch(NullPointerException e){
             		return "WARNING - NULL VALUE";

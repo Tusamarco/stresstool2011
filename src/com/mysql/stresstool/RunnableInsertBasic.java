@@ -286,10 +286,24 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 								String tmp ="";
 								Iterator<String> it = insert2.iterator();
 								while(it.hasNext()){
-									tmp = (String) it.next();									
-									if(this.debug)
-										System.out.println(tmp);
-									stmt.addBatch(tmp);
+									tmp = (String) it.next();
+									String[] tmpsAr = tmp.split(";");
+									if(tmpsAr.length < 1 ){
+										if(this.debug)
+											System.out.println(tmp);
+										
+										stmt.addBatch(tmp);
+									}
+									else{
+										for(int xs =0; xs < tmpsAr.length; xs++){
+											if(this.debug)
+												System.out.println(tmpsAr[xs]);
+											
+											stmt.addBatch(tmpsAr[xs]);
+										}
+										
+									}
+										
 								}
 								intBlobInterval=0;
 
@@ -410,6 +424,9 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 		
 	}
 
+	
+
+	
 	public int[] executeSQL(Statement stmt) throws Exception {
 	    int[] iLine= new int[0];
 	    try{
@@ -433,7 +450,10 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 		    		e.printStackTrace();
 		    }
 		}
-		else if(sqle.getErrorCode() > 0 && sqle.getErrorCode() != 1205  && lockRetry < 4) {
+		else if(sqle.getErrorCode() > 0 
+				&& sqle.getErrorCode() != 1452
+				&& sqle.getErrorCode() != 1205
+				&& lockRetry < 4) {
 		    	lockRetry++;
 		    	System.out.println("ERROR Found for thread = " + Thread.currentThread().getId() + " repeat N: " + lockRetry + " OF 3\n" + sqle.getLocalizedMessage());		    
 		    	
@@ -450,6 +470,10 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 		    }
 	    	
 	    }
+		else if(sqle.getErrorCode() == 1452){
+			return new int[0];
+			//System.out.print("x");
+		}
 		else if(lockRetry >=4){
 			stmt.clearBatch();
 			try{stmt.execute("ROLLBACK");}catch(Exception eex){}
