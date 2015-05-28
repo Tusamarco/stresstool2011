@@ -56,7 +56,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQueryInsertPartRange extends RunnableInsertBasic{
+public  class RunnableQueryInsertPartRange extends RunnableQueryInsertBasic{
 
 	public void run(){
 		super.run();

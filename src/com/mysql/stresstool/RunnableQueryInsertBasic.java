@@ -76,7 +76,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author marcotusa
  *
  */
-public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterface {
+public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertInterface {
 
 	private File queriesFileIn;
 	//    Connection conn = null;
@@ -121,7 +121,7 @@ public  class RunnableInsertBasic implements Runnable, RunnableQueryInsertInterf
 			"numberOfprimaryTables","numberOfSecondaryTables","useAutoIncrement","sleepWrite",
 			"yearstart","monthstart","daystart","daystotal","partitionType","debug","stikyconnection","lazyInterval"));
 		
-	public RunnableInsertBasic() {
+	public RunnableQueryInsertBasic() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		}

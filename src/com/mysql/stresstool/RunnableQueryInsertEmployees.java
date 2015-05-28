@@ -60,7 +60,7 @@ import com.sun.xml.internal.bind.v2.runtime.Name;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQueryInsertEmployees extends RunnableInsertBasic {
+public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 
 	private ArrayList <String> Name = null;
 	private ArrayList <String> LastName = null;

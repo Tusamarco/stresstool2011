@@ -53,7 +53,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQueryInsert extends RunnableInsertBasic implements Runnable, RunnableQueryInsertInterface {
+public  class RunnableQueryInsert extends RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertInterface {
 
 	private File queriesFileIn;
 	//    Connection conn = null;

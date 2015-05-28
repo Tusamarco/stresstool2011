@@ -54,7 +54,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableQueryInsertPCH extends RunnableInsertBasic{
+public  class RunnableQueryInsertPCH extends RunnableQueryInsertBasic{
 
 	String ServerId = null; 
 	
