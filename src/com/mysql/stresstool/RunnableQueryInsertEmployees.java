@@ -107,13 +107,13 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
             /**
              * employees max - min    
              */
-				ArrayList<employeeShort> rowValueempNo = new ArrayList();
-			    Long min = (long) 0;
-				ResultSet rs = null;
-				Statement stmt = null;
-	            conn.setAutoCommit(false);
-	            stmt = conn.createStatement(); 
-	            rs = stmt.executeQuery("select min(maxid) as min from tbtestmax ");
+		ArrayList<employeeShort> rowValueempNo = new ArrayList();
+		Long min = (long) 0;
+		ResultSet rs = null;
+		Statement stmt = null;
+	        conn.setAutoCommit(false);
+	        stmt = conn.createStatement(); 
+	        rs = stmt.executeQuery("select min(maxid) as min from tbtestmax ");
                 while(rs.next()){
                 	min=(Long) (rs.getLong(1));
                     
@@ -263,6 +263,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
             
             
 	}
+	@SuppressWarnings("unchecked")
 	@Override 
 	Vector getTablesValues(boolean refresh) {
 
@@ -590,7 +591,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 							+ " DECLARE CONTINUE HANDLER FOR 1054 SET sqlcode = 1054; \n"
 							+ " DECLARE CONTINUE HANDLER FOR 1136 SET sqlcode = 1136; \n"
 							+ " SET @LASTINSERT=0; \n"
-							+ " SELECT LAST_INSERT_ID() INTO @LASTINSERT; \n"
+							+ " SELECT MAX(emp_no) INTO @LASTINSERT FROM tbtest" + iTable +"; \n"
 							+ " REPLACE INTO tbtestmax values('tbtest"+iTable+"',@LASTINSERT) ; \n"
 							+ " END ");
 
@@ -614,7 +615,8 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 					sb.append(", PRIMARY KEY (emp_no,id, from_date)");
 					sb.append(", key `emp_no` (`emp_no`)");
 					sb.append(", UNIQUE `UK_is` (`id`)");
-					sb.append(", FOREIGN KEY (`emp_no`) REFERENCES `tbtest"+ iTable +"` (`emp_no`) ON DELETE CASCADE");
+					if(isFKEnable())
+					    sb.append(", FOREIGN KEY (`emp_no`) REFERENCES `tbtest"+ iTable +"` (`emp_no`) ON DELETE CASCADE");
 					sb.append(") ENGINE="+ sTool.tableEngine);
 	
 					if(!sb.toString().equals(""))

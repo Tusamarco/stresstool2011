@@ -64,7 +64,7 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author not attributable
  * @version 1.0
  */
-public  class RunnableMongodbQueryInsert extends RunnableInsertBasic implements Runnable, RunnableQueryInsertInterface {
+public  class RunnableMongodbQueryInsert extends RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertInterface {
 
 	private File queriesFileIn;
 	//    Connection conn = null;

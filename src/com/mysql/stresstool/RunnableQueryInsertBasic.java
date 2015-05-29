@@ -115,11 +115,25 @@ public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertI
 	private boolean debug = false;
 	private int lockRetry = 0;
 	private int lazyInterval = 500;
-	
+	private boolean FKEnable = false;
+
+	/**
+	 * @return the fKEnable
+	 */
+	public boolean isFKEnable() {
+	    return FKEnable;
+	}
+
+	/**
+	 * @param fKEnable the fKEnable to set
+	 */
+	public void setFKEnable(boolean fKEnable) {
+	    FKEnable = fKEnable;
+	}
 
 	private static final ArrayList <String> CLASS_PARAMETERS = new ArrayList(Arrays.asList(
 			"numberOfprimaryTables","numberOfSecondaryTables","useAutoIncrement","sleepWrite",
-			"yearstart","monthstart","daystart","daystotal","partitionType","debug","stikyconnection","lazyInterval"));
+			"yearstart","monthstart","daystart","daystotal","partitionType","debug","stikyconnection","FKEnable","lazyInterval"));
 		
 	public RunnableQueryInsertBasic() {
 		try {
