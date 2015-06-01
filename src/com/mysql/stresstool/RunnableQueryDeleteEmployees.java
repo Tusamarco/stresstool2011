@@ -115,8 +115,10 @@ public class RunnableQueryDeleteEmployees extends RunnableQueryDeleteBasic {
 			}
 			rsToDelete.close();
 
-			if (tbtestmax.size() > 0) {
+			if (tbtestmax.size() > 0 ) {
 				for (int iTable = 1; iTable <= getNumberOfprimaryTables(); iTable++) {
+				    
+				    if(tbtestmax.get("tbtest" + iTable) != null){
 					RowValue currentMax = tbtestmax.get("tbtest" + iTable);
 
 					long maxToDelete = new Double(((double) this.getDeleterowmaxpct() * currentMax.getMax()) / 100).longValue();
@@ -162,6 +164,7 @@ public class RunnableQueryDeleteEmployees extends RunnableQueryDeleteBasic {
 
 					}
 					stmt.execute("COMMIT");
+				    }
 
 				}
 			}

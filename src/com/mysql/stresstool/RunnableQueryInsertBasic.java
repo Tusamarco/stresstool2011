@@ -469,7 +469,8 @@ public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertI
 				&& sqle.getErrorCode() != 1205
 				&& lockRetry < 4) {
 		    	lockRetry++;
-		    	System.out.println("ERROR Found for thread = " + Thread.currentThread().getId() + " repeat N: " + lockRetry + " OF 3\n" + sqle.getLocalizedMessage());		    
+		    	System.out.println("ERROR Found for thread = " + Thread.currentThread().getId() + " repeat N: " + lockRetry + " OF 3\n" + sqle.getLocalizedMessage());
+//		    	sqle.printStackTrace();
 		    	
 		    	try {
 		    			iLine = executeSQL(stmt);
