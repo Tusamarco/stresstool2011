@@ -113,6 +113,8 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 		Statement stmt = null;
 	        conn.setAutoCommit(false);
 	        stmt = conn.createStatement(); 
+	        
+	        
 	        rs = stmt.executeQuery("select min(maxid) as min from tbtestmax ");
                 while(rs.next()){
                 	min=(Long) (rs.getLong(1));
@@ -120,17 +122,30 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
                 }
                 rs.close();
                
-                if (min > 1){
+                if (min > 1 ){
                 	emp_max.clear();
-	                rs = stmt.executeQuery("select maxid as max, tablename from tbtestmax order by 2 ");
-	                while(rs.next()){
-	                	emp_max.add((Long) (rs.getLong(1)));
-	                    
-	                }
-	                
-	                for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+                	Long maxId = (long)2; 
+                	for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+                	    	rs = stmt.executeQuery("select max(emp_no) from tbtest" + iTable );
+                	    	while(rs.next()){
+                	    	    maxId = rs.getLong(1);
+                	    	    emp_max.add((Long) (maxId));
+                	    	}
+//                	    	tableEmpNo.put("tbtest"+iTable, maxId);
+                	    	try{
+                	    	    stmt.execute("update tbtestmax  set maxid="+maxId+" where tablename = 'tbtest"+ iTable +"'");
+                	    	    conn.commit();
+                	    	}
+                	    	catch (SQLException ssq){ssq.printStackTrace();}
+                	}
+//                	rs = stmt.executeQuery("select maxid as max, tablename from tbtestmax order by 2 ");
+
+                	for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
 	                	
-	                	String sql = "select emp_no,to_days(hire_date) from tbtest" + iTable + " where linked=0 order by emp_no limit "+ this.getIBatchInsert();
+	                	String sql = "select emp_no,to_days(hire_date) from tbtest" + iTable + " where linked=0 order by emp_no limit  " 
+	                			+ StressTool.getNumberFromRandomMinMax(0, maxId.intValue()/getNumberOfprimaryTables()) 
+	                			+ ","  
+	                			+ this.getIBatchInsert();
 	                	rs = stmt.executeQuery(sql);
 	                	employeeShort rv = null;
 	                	while(rs.next()){
@@ -142,6 +157,15 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	                }
 	                
 //	                 update tbtest1 join tbtest_child1 on tbtest1.emp_no=tbtest_child1.emp_no set linked=1 where linked
+                }
+                else
+                {
+                	for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
+                	    try{
+                		stmt.execute("replace into tbtestmax values ('tbtest" + iTable + "', 2)" );
+                		conn.commit();
+                	    }catch(SQLException ssq){ssq.printStackTrace();}
+                	}                    
                 }
                 if(!rs.isClosed())
                 		rs.close();
@@ -297,6 +321,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 
 		int pk = StressTool.getNumberFromRandom(2147483647).intValue();
 		String insert1Str = "";
+		Map updateId = new SynchronizedMap();
 		
 		
 		
@@ -380,7 +405,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 					    			&& iLinked > getIBatchInsert()){
 					    		break;
 					    	}
-					    	insert3.append(","+ emp_no);
+					    	updateId.put(emp_no,0);
 				    		insert2.append("("
 						    		+ emp_no
 						    		+ ", Null"
@@ -440,7 +465,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 					    			&& iLinked > getIBatchInsert()){
 					    		break;
 					    	}
-					    	insert3.append(","+ emp_no);
+					    	updateId.put(emp_no,0);
 				    		insert2.append("("
 						    		+ emp_no
 						    		+ ", Null"
@@ -475,6 +500,10 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 					insertList1.add(insert1.toString());
 				if(!insertList2.equals("")){
 					if(!insert2.toString().equals("")){
+					    	Iterator itid = updateId.keySet().iterator();
+					    	while(itid.hasNext()){
+					    	    insert3.append("," +itid.next() );
+					    	}
 						String add_update=" ;update tbtest" +iTable+ " set linked=1 where emp_no in("+insert3.toString()+");";
 						insertList2.add(insert2.toString() + add_update);
 					}
@@ -585,15 +614,15 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	
 					sb.delete(0, sb.length());
 					stmt.execute("DROP TRIGGER IF EXISTS test.tbtest"+iTable+"_AFTER_INSERT;");
-					stmt.execute(" CREATE TRIGGER `tbtest"+ iTable +"_AFTER_INSERT` AFTER INSERT ON `tbtest"+iTable+"` FOR EACH ROW \n"
-							+ " BEGIN \n"
-							+ " DECLARE sqlcode INT DEFAULT 0; \n"
-							+ " DECLARE CONTINUE HANDLER FOR 1054 SET sqlcode = 1054; \n"
-							+ " DECLARE CONTINUE HANDLER FOR 1136 SET sqlcode = 1136; \n"
-							+ " SET @LASTINSERT=0; \n"
-							+ " SELECT MAX(emp_no) INTO @LASTINSERT FROM tbtest" + iTable +"; \n"
-							+ " REPLACE INTO tbtestmax values('tbtest"+iTable+"',@LASTINSERT) ; \n"
-							+ " END ");
+//					stmt.execute(" CREATE TRIGGER `tbtest"+ iTable +"_AFTER_INSERT` AFTER INSERT ON `tbtest"+iTable+"` FOR EACH ROW \n"
+//							+ " BEGIN \n"
+//							+ " DECLARE sqlcode INT DEFAULT 0; \n"
+//							+ " DECLARE CONTINUE HANDLER FOR 1054 SET sqlcode = 1054; \n"
+//							+ " DECLARE CONTINUE HANDLER FOR 1136 SET sqlcode = 1136; \n"
+//							+ " SET @LASTINSERT=0; \n"
+//							+ " SELECT MAX(emp_no) INTO @LASTINSERT FROM tbtest" + iTable +"; \n"
+//							+ " REPLACE INTO tbtestmax values('tbtest"+iTable+"',@LASTINSERT) ; \n"
+//							+ " END ");
 
 					
 				}
