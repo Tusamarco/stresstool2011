@@ -71,7 +71,8 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	private ArrayList <String> titles = null;
 	private Integer today = 0; 
 	private ArrayList <Long> emp_max = new ArrayList();
-	Map tableEmpNo = new SynchronizedMap(0);
+	private Map tableEmpNo = new SynchronizedMap(0);
+	private static Map empIdSync = new SynchronizedMap(0);
 	
 		
 	public RunnableQueryInsertEmployees() {
@@ -114,7 +115,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	        conn.setAutoCommit(false);
 	        stmt = conn.createStatement(); 
 	        tableEmpNo.clear();
-	        
+	        //test
 	        
 	        rs = stmt.executeQuery("select min(maxid) as min from tbtestmax ");
                 while(rs.next()){
@@ -157,6 +158,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	                	employeeShort rv = null;
 	                	while(rs.next()){
 	                		rv = new employeeShort(rs.getLong(1),rs.getLong(2));
+	                		super.getID();
 	                		rowValueempNo.add(rv);
 	                	}
 	                	if(rv !=null){
@@ -728,6 +730,36 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 
 
 
+	public static synchronized ArrayList getTableEmpNoItem(String key) {
+		if(empIdSync.get(key) == null){
+			ArrayList<employeeShort> rowValueempNo = new ArrayList();
+			empIdSync.put(key, rowValueempNo);
+			return rowValueempNo;
+		}
+		else
+			return (ArrayList) empIdSync.get(key);
+//			ArrayList<employeeShort> rowValueempNo = new ArrayList();
+//		return tableEmpNo;
+	}
+
+	public static synchronized void setTableEmpNoItem(String key, employeeShort object) {
+		if(key != null 
+				&& !key.equals("") 
+				&& !getTableEmpNoItem(key).contains(object)){
+			((ArrayList)empIdSync.get(key)).add(object);
+		}
+	}
+
+	public static synchronized void removeTableEmpNoItem(String key, employeeShort object) {
+		if(key != null 
+				&& !key.equals("") 
+				&& getTableEmpNoItem(key).contains(object)){
+			((ArrayList)empIdSync.get(key)).remove(object);
+		}
+	}
+
+
+
 }
 class employeeShort{
 	Long hiredDateDay = new Long(0);
@@ -754,5 +786,63 @@ class employeeShort{
 		this.empNo = empNo;
 	}
 	
+class empIdLOCK{
+		Long emp_no = (long)0;
+		int THID = 0;
+//		String tableName = null;
+		public synchronized Long getEmp_no() {
+			return emp_no;
+		}
+		public synchronized void setEmp_no(Long emp_no) {
+			this.emp_no = emp_no;
+		}
+		public synchronized int getTHID() {
+			return THID;
+		}
+		public synchronized void setTHID(int tHID) {
+			THID = tHID;
+		}
+		public empIdLOCK(Long emp_no, int tHID) {
+			super();
+			this.emp_no = emp_no;
+			THID = tHID;
+		}
 		
+//		public synchronized String getTableName() {
+//			return tableName;
+//		}
+//		public synchronized void setTableName(String tableName) {
+//			this.tableName = tableName;
+//		}
+		//
+
+	}	
+class  empLOCKMap{
+	Map locks = new SynchronizedMap(0);
+	String tableName = null;
+	public synchronized Map getLocks() {
+		return locks;
+	}
+	public synchronized void setLocks(Map locks) {
+		this.locks = locks;
+	}
+	public synchronized String getTableName() {
+		return tableName;
+	}
+	public synchronized void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+	public empLOCKMap(Map locks, String tableName) {
+		super();
+		this.locks = locks;
+		this.tableName = tableName;
+	}
+	public empIdLOCK getLockbyId(){
+		
+			return null;
+		
+	}
+	
+	
+ }
 }
