@@ -818,7 +818,7 @@ class empIdLOCK{
 
 	}	
 class  empLOCKMap{
-	Map locks = new SynchronizedMap(0);
+	Map <Long,empIdLOCK> locks = new SynchronizedMap(0);
 	String tableName = null;
 	public synchronized Map getLocks() {
 		return locks;
@@ -837,8 +837,10 @@ class  empLOCKMap{
 		this.locks = locks;
 		this.tableName = tableName;
 	}
-	public empIdLOCK getLockbyId(){
-		
+	public empIdLOCK getLockbyId(Long id){
+		if(locks.size() > 0 && locks.get(id)!=null)
+		    return locks.get(id);
+		    
 			return null;
 		
 	}
