@@ -194,8 +194,6 @@ private static void showHelp() {
          */
         java.util.Collections.sort(lParameters);
         
-        System.out.println("Test");
-        
         if(args.length >= 1 && args[0].indexOf("defaults-file") > 0){
 
         	try {
