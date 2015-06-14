@@ -133,7 +133,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
             /**
              * employees max - min    
              */
-		ArrayList<EmployeeShort> rowValueempNo = new ArrayList<EmployeeShort>();
+		ArrayList<EmployeeShort> rowValueempNo = null;
 		Long min = (long) 0;
 		ResultSet rs = null;
 		Statement stmt = null;
@@ -169,7 +169,11 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 //                	rs = stmt.executeQuery("select maxid as max, tablename from tbtestmax order by 2 ");
 
                 	for(int iTable = 1; iTable <= this.getNumberOfprimaryTables(); iTable++){
-            	    		String tableName = "tbtest" + iTable;   
+            	    		
+                	    	if(rowValueempNo == null)
+                	    		rowValueempNo = new ArrayList<EmployeeShort>();
+                	    	
+                	    	String tableName = "tbtest" + iTable;   
 
                 	    	
                 	    	if(this.isDebug())
@@ -203,10 +207,11 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 	                	if(rowValueempNo !=null
 	                		&& rowValueempNo.size() >0
 	                		){
-	                	    tableEmpNo.put(tableName, rowValueempNo);
+	                	    tableEmpNo.put(tableName, new ArrayList(rowValueempNo));
 	                	}
 	                	   
 	                	rs.close();
+	                	rowValueempNo.clear();
 	                }
 	                
 //	                 update tbtest1 join tbtest_child1 on tbtest1.emp_no=tbtest_child1.emp_no set linked=1 where linked
@@ -599,7 +604,7 @@ public  class RunnableQueryInsertEmployees extends RunnableQueryInsertBasic {
 							+ "`time_create` timestamp NOT NULL default CURRENT_TIMESTAMP, "
 							+ "`time_update` timestamp NOT NULL default CURRENT_TIMESTAMP  on update CURRENT_TIMESTAMP, "
 							+ " PRIMARY KEY (`emp_no`)"
-							+ ", KEY `idx_linked` (`linked`)"
+							+ ", KEY `idx_linked` (`linked`,`emp_no`)"
 							+ ", KEY `time_created_up` (`time_create`,time_update)"
 							+ ")");
 					
