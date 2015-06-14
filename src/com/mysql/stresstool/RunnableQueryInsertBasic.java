@@ -1264,6 +1264,55 @@ public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertI
 			}
 
 		}
+	        if( StressTool.getArgsInt().length >= 2 && StressTool.getArgsInt()[0].indexOf("defaults-file") > 0) {
+	            
+		        for(int i  = 1 ; i < StressTool.getArgsInt().length ; i++)
+		        {
+		            	String param = null;
+		            	String value = null;
+		            	param = StressTool.getArgsInt()[i].split("=")[0].trim();
+		            	value = StressTool.getArgsInt()[i].split("=")[1].trim();
+		            	
+				for(int ip = 0 ; ip < CLASS_PARAMETERS.size() ; ip++)
+				    try {
+					
+					String methodName = (String)CLASS_PARAMETERS.get(ip);
+					
+					if(param.equals(methodName)){
+	        				methodName = methodName.substring(0,1).toUpperCase() + methodName.substring(1,methodName.length()); 
+	        				methodName = "set"+methodName;
+	        				String valueM =value;
+	        				//						System.out.println(methodName + " = " + valueM);
+	        
+	        				if(valueM != null){
+	        				    if(valueM.equals("true") || valueM.equals("false")){
+	        					MethodUtils.invokeMethod(this,methodName,Boolean.parseBoolean(valueM));
+	        				    }
+	        				    else if(Utils.isNumeric(valueM)){
+	        
+	        					MethodUtils.invokeMethod(this,methodName,Integer.parseInt(valueM));
+	        				    }
+	        				    else
+	        					//							PropertyUtils.setProperty(this,methodName,valueM);
+	        					//							MethodUtils.setCacheMethods(false);
+	        					MethodUtils.invokeMethod(this,methodName,valueM);
+	        				}
+					}
+
+				    } catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				    } catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				    } catch (NoSuchMethodException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				    }
+		                
+		                
+		           }
+	        }		
 	}
 
 	public boolean isUseAutoIncrement() {

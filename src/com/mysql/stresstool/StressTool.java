@@ -124,7 +124,7 @@ public class StressTool {
     private boolean hasElasticSearch = false;
     private String elasticUrl;
     private Node nodeElastic;
-    
+    static String[] argsInt = null;
 /*
  * TODO: * Take out all the information about the configration and create a Configurator object
  *  	    
@@ -188,6 +188,7 @@ private static void showHelp() {
         if(args == null || args.length < 1)
             StressTool.showHelp();
 
+        StressTool.setArgsInt(args);
         /* TODO:
          * All the parameters need to be converted into one single map this is horrible.
          */
@@ -246,175 +247,47 @@ private static void showHelp() {
         
 	        for(int i  = 1 ; i < args.length ; i++)
 	        {
-	                if(args.length >= 1 && args[0] != null && this.connUrl == null)
-	                {
-	                    this.connUrl = args[0];
-	                }
-	                if(args[i] != null && args[i].indexOf("truncate") >= 0 )
-	                {
-	                    this.truncate = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("debug") >= 0 )
-	                {
-	                    this.debug = true;
-	                }
-	                if(args[i] != null && args[i].indexOf("droptable") >= 0 )
-	                {
-	                    this.droptable = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("createtable") >= 0 )
-	                {
-	                    this.createtable  = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	
-	                
-	                if(args[i] != null && args[i].indexOf("poolNumber") >= 0 )
-	                {
-	                    this.poolNumber = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("repeatNumber") >= 0 )
-	                {
-	                    this.repeatNumber = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("tableEngine") >= 0 )
-	                {
-	                    this.tableEngine = args[i].split("=")[1];
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("sleepFor") >= 0 )
-	                {
-	                    this.sleepFor = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("dbType") >= 0 )
-	                {
-	                    this.dbType = args[i].split("=")[1];
-	                    this.setDbType(this.dbType);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("operationShort") >= 0 )
-	                {
-	                    this.operationShort = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("doDelete") >= 0 )
-	                {
-	                    this.doDelete = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("doBatch") >= 0 )
-	                {
-	                    this.iBatchInsert = Integer.parseInt(args[i].split("=")[1]);
-	                    if(iBatchInsert > 0)
-	                    	this.doBatch = true;
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("dolog")>= 0 )
-	                {
-	                    this.dolog = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("pctInsert") >= 0 )
-	                {
-	                    this.pctInsert = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("pctSelect") >= 0 )
-	                {
-	                    this.pctSelect = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("pctDelete") >= 0 )
-	                {
-	                    this.pctDelete = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	
-	                
-	                if(args[i] != null && args[i].indexOf("doReport") >= 0 )
-	                {
-	                    this.doReport = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("doSimplePk") >= 0 )
-	                {
-	                    this.doSimplePk = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("ignorebinlog") >= 0 )
-	                {
-	                    this.ignoreBinlog = Boolean.parseBoolean(args[i].split("=")[1]);
-	                }
-	                
-	
-	                if(args[i] != null && args[i].indexOf("InsertClass") >= 0 )
-	                {
-	                	if(
-	                			args[i].split("=") != null 
-	                			&& args[i].split("=")[1] !=null 
-	                			&& args[i].split("=")[1].length() > 0)
-	                	{
-	                		this.insertDefaultClass = args[i].split("=")[1];
-	                	}
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("SelectClass") >= 0 )
-	                {
-	                	if(
-	                			args[i].split("=") != null 
-	                			&& args[i].split("=")[1] !=null 
-	                			&& args[i].split("=")[1].length() > 0)
-	                	{
-	                		this.selectDefaultClass = args[i].split("=")[1];
-	                	}
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("DeleteClass") >= 0 )
-	                {
-	                	if(
-	                			args[i].split("=") != null 
-	                			&& args[i].split("=")[1] !=null 
-	                			&& args[i].split("=")[1].length() > 0)
-	                	{
-	                		this.deleteDefaultClass = args[i].split("=")[1];
-	                	}
-	                }
-	                
-	                if(args[i] != null && args[i].indexOf("ConnectString") >= 0 )
-	                {
-	                	if(
-	                			args[i].split("=") != null 
-	                			&& args[i].split("=")[1] !=null 
-	                			&& args[i].split("=")[1].length() > 0)
-	                	{
-	                		this.connectString = args[i].split("=")[1];
-	                	}
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("DataBase") >= 0 )
-	                {
-	                	if(
-	                			args[i].split("=") != null 
-	                			&& args[i].split("=")[1] !=null 
-	                			&& args[i].split("=")[1].length() > 0)
-	                	{
-	                		this.databaseDefault = args[i].split("=")[1];
-	                	}
-	                }
-	                if(args[i] != null && args[i].indexOf("sleepWrite") >= 0 )
-	                {
-	                    this.sleepWrite = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	                if(args[i] != null && args[i].indexOf("sleepRead") >= 0 )
-	                {
-	                    this.sleepRead = Integer.parseInt(args[i].split("=")[1]);
-	                }                
-	                if(args[i] != null && args[i].indexOf("sleepDelete") >= 0 )
-	                {
-	                    this.sleepDelete = Integer.parseInt(args[i].split("=")[1]);
-	                }
-	
-	                if(args[i] != null && args[i].indexOf("sqlstring") >= 0 )
-	                {
-	                    this.sqlString = (String)(args[i].split("=")[1]);
-	                }
+	            	String param = null;
+	            	String value = null;
+	            	param = args[i].split("=")[0].trim();
+	            	value = args[i].split("=")[1].trim();
+	            	
+			for(int ip = 0 ; ip < lParameters.size() ; ip++)
+			    try {
+				
+				String methodName = (String)lParameters.get(ip);
+				
+				if(param.equals(methodName)){
+        				methodName = methodName.substring(0,1).toUpperCase() + methodName.substring(1,methodName.length()); 
+        				methodName = "set"+methodName;
+        				String valueM =value;
+        				//						System.out.println(methodName + " = " + valueM);
+        
+        				if(valueM != null){
+        				    if(valueM.equals("true") || valueM.equals("false")){
+        					MethodUtils.invokeMethod(this,methodName,Boolean.parseBoolean(valueM));
+        				    }
+        				    else if(Utils.isNumeric(valueM)){
+        
+        					MethodUtils.invokeMethod(this,methodName,Integer.parseInt(valueM));
+        				    }
+        				    else
+        					//							PropertyUtils.setProperty(this,methodName,valueM);
+        					//							MethodUtils.setCacheMethods(false);
+        					MethodUtils.invokeMethod(this,methodName,valueM);
+        				}
+				}
+
+			    } catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			    } catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			    } catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			    }
 	                
 	                
 	           }
@@ -1923,6 +1796,20 @@ private static void showHelp() {
 
 		public void setNodeElastic(Node nodeElastic) {
 			this.nodeElastic = nodeElastic;
+		}
+
+		/**
+		 * @return the argsInt
+		 */
+		public static  String[] getArgsInt() {
+		    return argsInt;
+		}
+
+		/**
+		 * @param argsInt the argsInt to set
+		 */
+		public static void setArgsInt(String[] argsIntIn) {
+		    argsInt = argsIntIn;
 		}
 
 }
