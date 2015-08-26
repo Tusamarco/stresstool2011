@@ -241,6 +241,11 @@ public class MySQLStats {
             statusReport.put("TIME",new Long(System.currentTimeMillis()));
             statusReport.put("SERVERID", this.getSystemVariableByName("server_id", true));
             statusReport.put("NumberOfThreads", this.getNumberOfThreads());
+            /**
+             * @todo 
+             * I will move this to an object for statistics that will provide the way information should be access and retrieve
+             * This is crap I know I will fix soon.
+             */
             
             
             while(rs.next())
@@ -251,12 +256,7 @@ public class MySQLStats {
                 value = ObjectHandler.convertString2Object((String)rs.getObject("Value"));
                 statusReport.put(name,value);
             }
-            /**
-             * @todo 
-             * I will move this to an object for statistics that will provide the way information should be access and retrieve
-             * This is crap I know I will fix soon.
-             */
-            
+
             
             if(this.engineName.toLowerCase().equals("ndbcluster")){
             	
@@ -547,7 +547,7 @@ public class MySQLStats {
         report.put("Threads", this.numberOfThreads);
         
         report.put("query Executed",this.getTotalQueryToRun());
-        report.put("query writes,", this.getTotalQueryToRunWrites());
+        report.put("query writes", this.getTotalQueryToRunWrites());
         report.put("query reads", this.getTotalQueryToRunReads());
         report.put("query deletes",this.getTotalQueryToRunDeletes());
         
@@ -590,309 +590,6 @@ public class MySQLStats {
 
     }
 
-    //    public String printFinalSummaryWrites(String toAdd) {
-//        this.startReport = (Map) statusReportsCollection.get(1);
-//        this.endReport = (Map) statusReportsCollection.get(statusReportsCollection.size());
-//
-//        getTotalEcecutionTime();
-//        StringWriter sw = new StringWriter();
-//        PrintWriter pw = new PrintWriter(sw);
-//        pw.println();
-//        pw.println();
-//        pw.println("****============================================================================*******");
-//        pw.println("****                        FINAL REPORT  *** WRITES***                         *******");
-//        pw.println("****============================================================================*******");
-//        pw.println("-------------------------------- GENERAL TEST INFORMATION ------------------------------------------");
-//        if(toAdd != null && !toAdd.equals(""))
-//            pw.println(toAdd);
-//        pw.println("Runned on = " + TimeTools.GetFullDate(((Long)startReport.get("TIME")).longValue()));
-//        pw.println("------------------------------GENERAL DATABASE INFORMATION -----------------------------------------");
-//        pw.println("Total Number Of query Executed = " + this.getTotalQueryToRun());
-//        pw.println("Total Number Of query Executed for writes = " + this.getTotalQueryToRunWrites());
-//        pw.println("Total Number Of query Executed for reads  = " + this.getTotalQueryToRunReads());
-//        pw.println("Total Number Of query Executed for deletes  = " + this.getTotalQueryToRunDeletes());
-//        
-//        pw.println("Total Kbyte IN  = " + this.getResultByName("Bytes_sent",false) + " xsec = " + (((Long)this.getResultByName("Bytes_sent",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Total Kbyte OUT  = " + this.getResultByName("Bytes_received",false) + " xsec = " + (((Long)this.getResultByName("Bytes_received",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("Total Execution time = " + this.totalExecutionTime/1000);
-//        pw.println("Inserts = " + this.getResultByName("Com_insert",false) + " xsec = " + (((Long)this.getResultByName("Com_insert",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Replace = " + this.getResultByName("Com_replace",false) + " xsec = " + (((Long)this.getResultByName("Com_replace",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        pw.println("Updates = " + this.getResultByName("Com_update",false) + " xsec = " + (((Long)this.getResultByName("Com_update",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Deletes = " + this.getResultByName("Com_delete",false) + " xsec = " + (((Long)this.getResultByName("Com_delete",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Selects = " + this.getResultByName("Com_select",false) + " xsec = " + (((Long)this.getResultByName("Com_select",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Begins = " + this.getResultByName("Com_begin",false) + " xsec = " + (((Long)this.getResultByName("Com_begin",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Commits = " + this.getResultByName("Com_commit",false) + " xsec = " + (((Long)this.getResultByName("Com_commit",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        
-//        
-//        pw.println("Number of Connections = " + this.getResultByName("Connections",false) + " xsec = " + (((Long)this.getResultByName("Connections",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Temporary table on disk = " + this.getResultByName("Created_tmp_disk_tables",false));
-//        pw.println("Number of Questions = " + this.getResultByName("Questions",false) + " xsec = " + (((Long)this.getResultByName("Questions",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Max_used_connections = " + this.getResultByName("Max_used_connections",false) + " xsec = " + (((Long)this.getResultByName("Max_used_connections",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Opened_tables = " + this.getResultByName("Opened_tables",false) + " xsec = " + (((Long)this.getResultByName("Opened_tables",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("------------------------------------ DELAYS ------------------------------------------------");
-//        pw.println("Delayed insert threads   = " + this.getResultByName("Delayed_insert_threads",false) + " xsec = " + (((Long)this.getResultByName("Delayed_insert_threads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Delayed Errors  = " + this.getResultByName("Delayed_errors",false) + " xsec = " + (((Long)this.getResultByName("Delayed_errors",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Delayed writes  = " + this.getResultByName("Delayed_writes",false) + " xsec = " + (((Long)this.getResultByName("Delayed_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Not flushed delayed rows = " + this.getResultByName("Not_flushed_delayed_rows",false) + " xsec = " + (((Long)this.getResultByName("Not_flushed_delayed_rows",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//    
-//        
-//        pw.println("------------------------------------ LOCKS ------------------------------------------------");
-//        pw.println("Number of Table_locks_immediate = " + this.getResultByName("Table_locks_immediate",false) + " xsec = " + (((Long)this.getResultByName("Table_locks_immediate",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Table_locks_waited = " + this.getResultByName("Table_locks_waited",false) + " xsec = " + (((Long)this.getResultByName("Table_locks_waited",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("-----------------------------INNODB BUFFER POOL ACTIONS -----------------------------------");
-//        pw.println("Number of Innodb_buffer_pool_pages_flushed = " + this.getResultByName("Innodb_buffer_pool_pages_flushed",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_flushed",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_ahead_rnd = " + this.getResultByName("Innodb_buffer_pool_read_ahead_rnd",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_ahead_rnd",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_ahead_seq = " + this.getResultByName("Innodb_buffer_pool_read_ahead_seq",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_ahead_seq",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_requests = " + this.getResultByName("Innodb_buffer_pool_read_requests",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_data_fsyncs = " + this.getResultByName("Innodb_data_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("-----------------------------INNODB BUFFER POOL Dirty Page -----------------------------------");
-//        pw.println("Number of Innodb_buffer_pool_pages_dirty = " + this.getResultByName("Innodb_buffer_pool_pages_dirty",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false)).longValue()/(this.totalExecutionTime/1000)));
-////        if((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false) == 0){
-////        	pw.println("Number of Innodb_buffer_pool_pages_dirty % = 0");
-////        }
-////        else{
-////        	pw.println("Number of Innodb_buffer_pool_pages_dirty % = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false)/((Long)this.getResultByName("Innodb_buffer_pool_pages_total",false))))*100);
-////        }
-//
-//        
-//        pw.println("--------------------------------- INNODB DATA READS ----------------------------------------");
-//        pw.println("Number of Innodb_data_reads = " + this.getResultByName("Innodb_data_reads",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_reads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_read = " + this.getResultByName("Innodb_rows_read",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_read",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_read = " + this.getResultByName("Innodb_pages_read",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_read",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("----------------------------------INNODB DATA WRITES ---------------------------------------");
-//        pw.println("Number of Innodb_data_writes = " + this.getResultByName("Innodb_data_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_inserted = " + this.getResultByName("Innodb_rows_inserted",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_inserted",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_updated = " + this.getResultByName("Innodb_rows_updated",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_updated",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_deleted = " + this.getResultByName("Innodb_rows_deleted",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_deleted",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_written = " + this.getResultByName("Innodb_pages_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_created = " + this.getResultByName("Innodb_pages_created",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_created",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("-----------------------------------INNODB DBLBUFFER WRITES ---------------------------------");
-//        pw.println("Number of Innodb_dblwr_writes = " + this.getResultByName("Innodb_dblwr_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_dblwr_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_dblwr_pages_written = " + this.getResultByName("Innodb_dblwr_pages_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_dblwr_pages_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("-----------------------------------INNODB LOG Activities ---------------------------------");
-//        
-//        pw.println("Number of Innodb_log_waits = " + this.getResultByName("Innodb_log_waits",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_waits",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_log_write_requests = " + this.getResultByName("Innodb_log_write_requests",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_write_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_log_writes = " + this.getResultByName("Innodb_log_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_fsyncs = " + this.getResultByName("Innodb_os_log_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_pending_fsyncs = " + this.getResultByName("Innodb_os_log_pending_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_pending_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_pending_writes = " + this.getResultByName("Innodb_os_log_pending_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_pending_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_written = " + this.getResultByName("Innodb_os_log_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//                
-//        pw.println("-----------------------------------MyIsam Key Buffer ---------------------------------------");
-//        pw.println("Number of Key_reads = " + this.getResultByName("Key_reads",false) + " xsec = " + (((Long)this.getResultByName("Key_reads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_writes = " + this.getResultByName("Key_writes",false) + " xsec = " + (((Long)this.getResultByName("Key_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("Number of Key_read_requests = " + this.getResultByName("Key_read_requests",false) + " xsec = " + (((Long)this.getResultByName("Key_read_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_write_requests = " + this.getResultByName("Key_write_requests",false) + " xsec = " + (((Long)this.getResultByName("Key_write_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Number of Key_blocks_not_flushed = " + this.getResultByName("Key_blocks_not_flushed",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_not_flushed",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_blocks_unused = " + this.getResultByName("Key_blocks_unused",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_unused",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_blocks_used = " + this.getResultByName("Key_blocks_used",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_used",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        
-//        pw.println("----------------------------------- QUERY CACHE --------------------------------------------");
-//        pw.println("Number of Qcache_hits = " + this.getResultByName("Qcache_hits",false) + " xsec = " + (((Long)this.getResultByName("Qcache_hits",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_inserts = " + this.getResultByName("Qcache_inserts",false) + " xsec = " + (((Long)this.getResultByName("Qcache_inserts",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_not_cached = " + this.getResultByName("Qcache_not_cached",false) + " xsec = " + (((Long)this.getResultByName("Qcache_not_cached",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_lowmem_prunes = " + this.getResultByName("Qcache_lowmem_prunes",false) + " xsec = " + (((Long)this.getResultByName("Qcache_lowmem_prunes",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Number of Qcache_free_memory = " + this.getResultByName("Qcache_free_memory",false) + " xsec = " + (((Long)this.getResultByName("Qcache_free_memory",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        pw.println("Number of Qcache_queries_in_cache = " + this.getResultByName("Qcache_queries_in_cache",false) + " xsec = " + (((Long)this.getResultByName("Qcache_queries_in_cache",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_total_blocks = " + this.getResultByName("Qcache_total_blocks",false) + " xsec = " + (((Long)this.getResultByName("Qcache_total_blocks",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("------------------------------------ THREADS    --------------------------------------------");
-//        pw.println("Number of Threads_cached = " + this.getResultByName("Threads_cached",false) );
-//        pw.println("Number of Threads_connected = " + this.getResultByName("Threads_connected",false) );
-//        pw.println("Number of Threads_created = " + this.getResultByName("Threads_created",false) );
-//        pw.println("Number of Threads_running = " + this.getMaxResultByName("Threads_running",false) );
-//
-//
-///*
-//
-//       | Innodb_os_log_fsyncs              | 10291     |
-//       | Innodb_os_log_pending_fsyncs      | 0         |
-//       | Innodb_os_log_pending_writes      | 0         |
-//       | Innodb_os_log_written             | 94844928  |
-//
-//       | Innodb_row_lock_current_waits     | 0         |
-//       | Innodb_row_lock_time              | 0         |
-//       | Innodb_row_lock_time_avg          | 0         |
-//       | Innodb_row_lock_time_max          | 0         |
-//       | Innodb_row_lock_waits             | 0         |
-//       | Max_used_connections              | 63        |
-//       | Table_locks_immediate             | 15312     |
-//       | Table_locks_waited                | 0         |
-//       | Threads_cached                    | 7         |
-//       | Threads_connected                 | 3         |
-//       | Threads_created                   | 68        |
-//       | Threads_running                   | 1         |
-//  */
-//
-//
-//        return sw.toString();
-//
-//
-//
-//    }
-//
-//    public String printFinalSummaryRead(String toAdd) {
-//        this.startReport = (Map) statusReportsCollection.get(1);
-//        this.endReport = (Map) statusReportsCollection.get(statusReportsCollection.size());
-//
-//        getTotalEcecutionTime();
-//        StringWriter sw = new StringWriter();
-//        PrintWriter pw = new PrintWriter(sw);
-//        pw.println();
-//        pw.println();
-//        pw.println("****============================================================================*******");
-//        pw.println("****                        FINAL REPORT   *** READS ***                        *******");
-//        pw.println("****============================================================================*******");
-//        pw.println("-------------------------------- GENERAL TEST INFORMATION ------------------------------------------");
-//        if(toAdd != null && !toAdd.equals(""))
-//            pw.println(toAdd);
-//        pw.println("Runned on = " + TimeTools.GetFullDate(((Long)startReport.get("TIME")).longValue()));
-//        pw.println("------------------------------GENERAL DATABASE INFORMATION -----------------------------------------");
-//        pw.println("Total Number Of query Executed = " + this.getTotalQueryToRun());
-//        pw.println("Total Number Of query Executed for writes = " + this.getTotalQueryToRunWrites());
-//        pw.println("Total Number Of query Executed for reads  = " + this.getTotalQueryToRunReads());
-//        pw.println("Total Number Of query Executed for deletes  = " + this.getTotalQueryToRunDeletes());
-//        
-//        pw.println("Total Kbyte IN  = " + this.getResultByName("Bytes_sent",false) + " xsec = " + (((Long)this.getResultByName("Bytes_sent",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Total Kbyte OUT  = " + this.getResultByName("Bytes_received",false) + " xsec = " + (((Long)this.getResultByName("Bytes_received",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("Total Execution time = " + this.totalExecutionTime/1000);
-//        pw.println("Inserts = " + this.getResultByName("Com_insert",false) + " xsec = " + (((Long)this.getResultByName("Com_insert",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Replace = " + this.getResultByName("Com_replace",false) + " xsec = " + (((Long)this.getResultByName("Com_replace",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        pw.println("Updates = " + this.getResultByName("Com_update",false) + " xsec = " + (((Long)this.getResultByName("Com_update",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Deletes = " + this.getResultByName("Com_delete",false) + " xsec = " + (((Long)this.getResultByName("Com_delete",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Selects = " + this.getResultByName("Com_select",false) + " xsec = " + (((Long)this.getResultByName("Com_select",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Begins = " + this.getResultByName("Com_begin",false) + " xsec = " + (((Long)this.getResultByName("Com_begin",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Commits = " + this.getResultByName("Com_commit",false) + " xsec = " + (((Long)this.getResultByName("Com_commit",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        
-//        
-//        pw.println("Number of Connections = " + this.getResultByName("Connections",false) + " xsec = " + (((Long)this.getResultByName("Connections",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Temporary table on disk = " + this.getResultByName("Created_tmp_disk_tables",false));
-//        pw.println("Number of Questions = " + this.getResultByName("Questions",false) + " xsec = " + (((Long)this.getResultByName("Questions",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Max_used_connections = " + this.getResultByName("Max_used_connections",false) + " xsec = " + (((Long)this.getResultByName("Max_used_connections",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Opened_tables = " + this.getResultByName("Opened_tables",false) + " xsec = " + (((Long)this.getResultByName("Opened_tables",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("------------------------------------ DELAYS ------------------------------------------------");
-//        pw.println("Delayed insert threads   = " + this.getResultByName("Delayed_insert_threads",false) + " xsec = " + (((Long)this.getResultByName("Delayed_insert_threads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Delayed Errors  = " + this.getResultByName("Delayed_errors",false) + " xsec = " + (((Long)this.getResultByName("Delayed_errors",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Delayed writes  = " + this.getResultByName("Delayed_writes",false) + " xsec = " + (((Long)this.getResultByName("Delayed_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Not flushed delayed rows = " + this.getResultByName("Not_flushed_delayed_rows",false) + " xsec = " + (((Long)this.getResultByName("Not_flushed_delayed_rows",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//    
-//        
-//        pw.println("------------------------------------ LOCKS ------------------------------------------------");
-//        pw.println("Number of Table_locks_immediate = " + this.getResultByName("Table_locks_immediate",false) + " xsec = " + (((Long)this.getResultByName("Table_locks_immediate",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Table_locks_waited = " + this.getResultByName("Table_locks_waited",false) + " xsec = " + (((Long)this.getResultByName("Table_locks_waited",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("-----------------------------INNODB BUFFER POOL ACTIONS -----------------------------------");
-//        pw.println("Number of Innodb_buffer_pool_pages_flushed = " + this.getResultByName("Innodb_buffer_pool_pages_flushed",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_flushed",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_ahead_rnd = " + this.getResultByName("Innodb_buffer_pool_read_ahead_rnd",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_ahead_rnd",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_ahead_seq = " + this.getResultByName("Innodb_buffer_pool_read_ahead_seq",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_ahead_seq",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_buffer_pool_read_requests = " + this.getResultByName("Innodb_buffer_pool_read_requests",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_read_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_data_fsyncs = " + this.getResultByName("Innodb_data_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("-----------------------------INNODB BUFFER POOL Dirty Page -----------------------------------");
-//        pw.println("Number of Innodb_buffer_pool_pages_dirty = " + this.getResultByName("Innodb_buffer_pool_pages_dirty",false) + " xsec = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false)).longValue()/(this.totalExecutionTime/1000)));
-////        if((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false) == 0){
-////        	pw.println("Number of Innodb_buffer_pool_pages_dirty % = 0");
-////        }
-////        else{
-////        	pw.println("Number of Innodb_buffer_pool_pages_dirty % = " + (((Long)this.getResultByName("Innodb_buffer_pool_pages_dirty",false)/((Long)this.getResultByName("Innodb_buffer_pool_pages_total",false))))*100);
-////        }
-//
-//        
-//        pw.println("--------------------------------- INNODB DATA READS ----------------------------------------");
-//        pw.println("Number of Innodb_data_reads = " + this.getResultByName("Innodb_data_reads",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_reads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_read = " + this.getResultByName("Innodb_rows_read",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_read",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_read = " + this.getResultByName("Innodb_pages_read",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_read",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("----------------------------------INNODB DATA WRITES ---------------------------------------");
-//        pw.println("Number of Innodb_data_writes = " + this.getResultByName("Innodb_data_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_data_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_inserted = " + this.getResultByName("Innodb_rows_inserted",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_inserted",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_updated = " + this.getResultByName("Innodb_rows_updated",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_updated",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_rows_deleted = " + this.getResultByName("Innodb_rows_deleted",false) + " xsec = " + (((Long)this.getResultByName("Innodb_rows_deleted",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_written = " + this.getResultByName("Innodb_pages_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_pages_created = " + this.getResultByName("Innodb_pages_created",false) + " xsec = " + (((Long)this.getResultByName("Innodb_pages_created",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("-----------------------------------INNODB DBLBUFFER WRITES ---------------------------------");
-//        pw.println("Number of Innodb_dblwr_writes = " + this.getResultByName("Innodb_dblwr_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_dblwr_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_dblwr_pages_written = " + this.getResultByName("Innodb_dblwr_pages_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_dblwr_pages_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("-----------------------------------INNODB LOG Activities ---------------------------------");
-//        
-//        pw.println("Number of Innodb_log_waits = " + this.getResultByName("Innodb_log_waits",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_waits",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_log_write_requests = " + this.getResultByName("Innodb_log_write_requests",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_write_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_log_writes = " + this.getResultByName("Innodb_log_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_log_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_fsyncs = " + this.getResultByName("Innodb_os_log_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_pending_fsyncs = " + this.getResultByName("Innodb_os_log_pending_fsyncs",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_pending_fsyncs",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_pending_writes = " + this.getResultByName("Innodb_os_log_pending_writes",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_pending_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Innodb_os_log_written = " + this.getResultByName("Innodb_os_log_written",false) + " xsec = " + (((Long)this.getResultByName("Innodb_os_log_written",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//                
-//        pw.println("-----------------------------------MyIsam Key Buffer ---------------------------------------");
-//        pw.println("Number of Key_reads = " + this.getResultByName("Key_reads",false) + " xsec = " + (((Long)this.getResultByName("Key_reads",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_writes = " + this.getResultByName("Key_writes",false) + " xsec = " + (((Long)this.getResultByName("Key_writes",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("Number of Key_read_requests = " + this.getResultByName("Key_read_requests",false) + " xsec = " + (((Long)this.getResultByName("Key_read_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_write_requests = " + this.getResultByName("Key_write_requests",false) + " xsec = " + (((Long)this.getResultByName("Key_write_requests",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Number of Key_blocks_not_flushed = " + this.getResultByName("Key_blocks_not_flushed",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_not_flushed",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_blocks_unused = " + this.getResultByName("Key_blocks_unused",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_unused",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Key_blocks_used = " + this.getResultByName("Key_blocks_used",false) + " xsec = " + (((Long)this.getResultByName("Key_blocks_used",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        
-//        pw.println("----------------------------------- QUERY CACHE --------------------------------------------");
-//        pw.println("Number of Qcache_hits = " + this.getResultByName("Qcache_hits",false) + " xsec = " + (((Long)this.getResultByName("Qcache_hits",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_inserts = " + this.getResultByName("Qcache_inserts",false) + " xsec = " + (((Long)this.getResultByName("Qcache_inserts",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_not_cached = " + this.getResultByName("Qcache_not_cached",false) + " xsec = " + (((Long)this.getResultByName("Qcache_not_cached",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_lowmem_prunes = " + this.getResultByName("Qcache_lowmem_prunes",false) + " xsec = " + (((Long)this.getResultByName("Qcache_lowmem_prunes",false)).longValue()/(this.totalExecutionTime/1000)));
-//
-//        pw.println("Number of Qcache_free_memory = " + this.getResultByName("Qcache_free_memory",false) + " xsec = " + (((Long)this.getResultByName("Qcache_free_memory",false)).longValue()/(this.totalExecutionTime/1000)));        
-//        pw.println("Number of Qcache_queries_in_cache = " + this.getResultByName("Qcache_queries_in_cache",false) + " xsec = " + (((Long)this.getResultByName("Qcache_queries_in_cache",false)).longValue()/(this.totalExecutionTime/1000)));
-//        pw.println("Number of Qcache_total_blocks = " + this.getResultByName("Qcache_total_blocks",false) + " xsec = " + (((Long)this.getResultByName("Qcache_total_blocks",false)).longValue()/(this.totalExecutionTime/1000)));
-//        
-//        pw.println("------------------------------------ THREADS    --------------------------------------------");
-//        pw.println("Number of Threads_cached = " + this.getResultByName("Threads_cached",false) );
-//        pw.println("Number of Threads_connected = " + this.getResultByName("Threads_connected",false) );
-//        pw.println("Number of Threads_created = " + this.getResultByName("Threads_created",false) );
-//        pw.println("Number of Threads_running = " + this.getMaxResultByName("Threads_running",false) );
-//
-///*
-//
-//       | Innodb_os_log_fsyncs              | 10291     |
-//       | Innodb_os_log_pending_fsyncs      | 0         |
-//       | Innodb_os_log_pending_writes      | 0         |
-//       | Innodb_os_log_written             | 94844928  |
-//
-//       | Innodb_row_lock_current_waits     | 0         |
-//       | Innodb_row_lock_time              | 0         |
-//       | Innodb_row_lock_time_avg          | 0         |
-//       | Innodb_row_lock_time_max          | 0         |
-//       | Innodb_row_lock_waits             | 0         |
-//       | Max_used_connections              | 63        |
-//       | Table_locks_immediate             | 15312     |
-//       | Table_locks_waited                | 0         |
-//       | Threads_cached                    | 7         |
-//       | Threads_connected                 | 3         |
-//       | Threads_created                   | 68        |
-//       | Threads_running                   | 1         |
-//  */
-//        
-//        return sw.toString();
-//
-//    }
 
 
 
