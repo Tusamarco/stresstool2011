@@ -547,7 +547,7 @@ public class MySQLStats {
         report.put("Threads", this.numberOfThreads);
         
         report.put("query Executed",this.getTotalQueryToRun());
-        report.put("query writes,", this.getTotalQueryToRunWrites());
+        report.put("query writes", this.getTotalQueryToRunWrites());
         report.put("query reads", this.getTotalQueryToRunReads());
         report.put("query deletes",this.getTotalQueryToRunDeletes());
         
