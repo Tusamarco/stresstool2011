@@ -111,7 +111,7 @@ public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertI
 	private int monthstart = 1;
 	private int daystart = 1;
 	private int daystotal = 1;
-	private String partitionType = "range";
+	public String partitionType = "range";
 	private boolean stikyconnection = true;
 	private boolean debug = false;
 	private int lockRetry = 0;
@@ -1026,26 +1026,26 @@ public  class RunnableQueryInsertBasic implements Runnable, RunnableQueryInsertI
 				sb.append(" `strrecordtype` char(3) NULL");
 				if (this.isUseAutoIncrement()){
 				    if(this.partitionType.equals("range")){
-					sb.append(", PRIMARY KEY  (`autoInc`,`date`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid) ");
+					sb.append(", PRIMARY KEY  (`autoInc`,`date`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid), INDEX `IDX_date` (date) ");
 				    }
 				    else{
-					sb.append(", PRIMARY KEY  (`autoInc`,`partitionid`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid) ");
+					sb.append(", PRIMARY KEY  (`autoInc`,`partitionid`),  INDEX `IDX_a` (a),  INDEX `IDX_uuid` (uuid), INDEX `IDX_date` (date) ");
 				    }
 				}
 				else{
 					if(!this.doSimplePk)
 					    if(this.partitionType.equals("range")){
-					    	sb.append(", PRIMARY KEY  (`uuid`,`date`),  INDEX `IDX_a` (a) ");
+					    	sb.append(", PRIMARY KEY  (`uuid`,`date`),  INDEX `IDX_a` (a), INDEX `IDX_date` (date) ");
 					    }
 					    else{
-						sb.append(", PRIMARY KEY  (`uuid`,`partitionid`),  INDEX `IDX_a` (a) ");
+						sb.append(", PRIMARY KEY  (`uuid`,`partitionid`),  INDEX `IDX_a` (a), INDEX `IDX_date` (date)");
 					    }
 					else{ 
 					    if(this.partitionType.equals("range")){
-						sb.append(", PRIMARY KEY  (`a`,`date`),  INDEX `IDX_uuid` (uuid) ");
+						sb.append(", PRIMARY KEY  (`a`,`date`),  INDEX `IDX_uuid` (uuid), INDEX `IDX_date` (date) ");
 					    }
 					    else{
-						sb.append(", PRIMARY KEY  (`a`,`partitionid`),  INDEX `IDX_uuid` (uuid) ");
+						sb.append(", PRIMARY KEY  (`a`,`partitionid`),  INDEX `IDX_uuid` (uuid), INDEX `IDX_date` (date) ");
 					    }
 					}
 				}
