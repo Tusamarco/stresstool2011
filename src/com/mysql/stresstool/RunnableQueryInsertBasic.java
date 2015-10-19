@@ -22,7 +22,7 @@
  * <p>Company: MySQL</p>
  *
  */
-//V 1.1
+//V 1.2
 package com.mysql.stresstool;
 
 import java.io.BufferedReader;
